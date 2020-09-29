@@ -22,3 +22,7 @@ jobs:
           autoreconf -i configure.ac
           ./configure $MPI
           make -j check LOG_DRIVER_FLAGS=--comments
+      - name: Cache
+        uses: actions/cache@v2.1.1 
+        with: 
+         path: t/test-suite.log
