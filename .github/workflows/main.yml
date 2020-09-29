@@ -23,6 +23,7 @@ jobs:
         uses: actions/cache@v2.1.1 
         with: 
          path: t/test-suite.log
+         key: ${{ matrix.with_mpi }}-suite.log
       - name: Build
         run: | 
           autoreconf -i configure.ac
