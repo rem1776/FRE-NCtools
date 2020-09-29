@@ -16,13 +16,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup
-        run: sudo apt-get install -y libnetcdf-dev libnetcdff-dev netcdf-bin libopenmpi-dev openmpi-bin bats
+        run: |
+          sudo add-apt-repository ppa:remik-ziemlinski/nccmp
+          sudo apt-get update
+          sudo apt-get install -y libnetcdf-dev libnetcdff-dev netcdf-bin libopenmpi-dev openmpi-bin bats nccmp
+      - name: Cache log file
+        uses: actions/cache@v2.1.1 
+        with: 
+         path: t/test-suite.log
       - name: Build
         run: | 
           autoreconf -i configure.ac
           ./configure $MPI
           make -j check LOG_DRIVER_FLAGS=--comments
-      - name: Cache
-        uses: actions/cache@v2.1.1 
-        with: 
-         path: t/test-suite.log
+      
