@@ -7,6 +7,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Build Container
-      run: docker build . -t FRE-NCtools
+      run: docker build . -t fre-nctools
     - name: Run Tests
-      run: docker run --entrypoint "/bin/sh" FRE-NCtools /build.sh
+      run: docker run --entrypoint "/bin/sh" fre-nctools /build.sh
