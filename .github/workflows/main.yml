@@ -6,27 +6,13 @@ name: build_FRE-NCtools
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ubuntu-16.04	
+    runs:
+      using: 'docker'
+      image: 'Dockerfile'
     strategy:
       matrix:
         with_mpi: ['--with-mpi', '']
     env:
       MPI: ${{ matrix.with_mpi }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup
-        run: |
-          sudo add-apt-repository ppa:remik-ziemlinski/nccmp --update
-          sudo apt-get install -y libnetcdf-dev libnetcdff-dev netcdf-bin libopenmpi-dev openmpi-bin bats nccmp
-      - name: Build and test
-        run: | 
-          autoreconf -i configure.ac
-          ./configure $MPI
-          make -j check LOG_DRIVER_FLAGS=--comments
-      - name: Save log file
-        uses: actions/upload-artifact@v2
-        if: failure()
-        with:
-          name: test-suite${{ matrix.with_mpi}}.log
-          path: t/test-suite.log
+      - uses: actions/checkout@v2
