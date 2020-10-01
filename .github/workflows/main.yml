@@ -4,13 +4,6 @@
 name: build_FRE-NCtools
 
 on: [push, pull_request]
-#strategy:
-#  matrix:
-#    with_mpi: ['--with-mpi', '']
-#steps:
-#  - uses: actions/checkout@v2
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  args:
-   - ${{matrix.with_mpi }}
