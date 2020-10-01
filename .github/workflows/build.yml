@@ -1,0 +1,11 @@
+name: FRE-NCtools CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on:ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+    - name: Build Container
+      run: docker build . -t FRE-NCtools
+    - name: Run Tests
+      run: docker run --entrypoint "/bin/sh" FRE-NCtools /build.sh
