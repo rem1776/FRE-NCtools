@@ -1,9 +1,16 @@
 # Github actions CI file
 # Ryan Mulhall 2020
 # Configures with and without mpi and runs make check
-name: build_FRE-NCtools
+name: 'build_FRE-NCtools'
 
-on: [push, pull_request]
+description: 'Container action for FRE-NCtools'
+author: 'Ryan Mulhall'
+inputs: 
+  myInput:
+    description: 'Input to use'
+    default: 'world'
 runs:
   using: 'docker'
   image: 'Dockerfile'
+  args:
+    - ${{ inputs.myInput }}
