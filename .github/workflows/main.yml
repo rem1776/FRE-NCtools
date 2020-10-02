@@ -29,4 +29,4 @@ jobs:
         if: failure()
         with:
           name: test-suite${{ matrix.with_mpi}}.log
-          path: t/test-suite.log
+          path: t/ocean_temp_salt.res.latlon.nc
