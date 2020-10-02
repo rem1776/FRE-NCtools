@@ -9,4 +9,4 @@ jobs:
     - name: Build Container
       run: docker build . -t fre-nctools
     - name: Run Tests
-      run: docker run --entrypoint "/bin/sh" fre-nctools /build.sh
+      run: docker run -u root --entrypoint "/bin/sh" fre-nctools /build.sh
