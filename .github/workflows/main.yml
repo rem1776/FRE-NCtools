@@ -23,13 +23,11 @@ jobs:
         run: | 
           autoreconf -i configure.ac
           ./configure $MPI
+          find . -name ocean_temp_salt.res.latlon.nc
           make -j check LOG_DRIVER_FLAGS=--comments
-      - name: find file
-        run: |
-          find $GITHUB_WORKSPACE -name ocean_temp_salt.res.latlon.nc
       - name: Save log file
         uses: actions/upload-artifact@v2
         if: failure()
         with:
           name: test-suite${{ matrix.with_mpi}}.log
-          path: $GITHUB_WORKSPACE/ocean_temp_salt.res.latlon.nc
+          path: /home/runner/work/FRE-NCtools/FRE-NCtools/t/ocean_temp_salt.res.latlon.nc
