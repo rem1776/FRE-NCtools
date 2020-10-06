@@ -30,4 +30,4 @@ jobs:
         if: failure()
         with:
           name: test-suite${{ matrix.with_mpi}}.log
-          path: /home/runner/work/FRE-NCtools/FRE-NCtools/t/ocean_temp_salt.res.latlon.nc
+          path: /home/runner/work/FRE-NCtools/FRE-NCtools/t/Test24/ocean_temp_salt.res.latlon.nc
