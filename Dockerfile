@@ -3,7 +3,7 @@ FROM ubuntu:xenial
 RUN apt-get update \
  && apt-get -y install software-properties-common \
  && add-apt-repository ppa:remik-ziemlinski/nccmp --update \
- && apt-get install -y libnetcdf-dev libnetcdff-dev netcdf-bin libopenmpi-dev openmpi-bin bats nccmp
+ && apt-get install -y libnetcdf-dev libnetcdff-dev netcdf-bin libopenmpi-dev openmpi-bin bats nccmp autoconf
 ## copy over repo
 COPY . .
 ## run tests
