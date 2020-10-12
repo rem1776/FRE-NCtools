@@ -12,7 +12,7 @@ jobs:
     - name: Build Container
       uses: docker/build-push-action@v2
       with:
-        push: true
+        pull: true
         tags: ${{ secrets.DOCKER_USR }}/fre-nc-tools-ci:latest
     - name: Run Tests
       run: docker run -u root --entrypoint "/bin/sh" fre-nc-tools-ci /build.sh
