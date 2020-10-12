@@ -1,0 +1,18 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Docker Login
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USR }}
+        password: ${{ secrets.DOCKER_ACCESS_FRENC }}
+    - name: Build Container
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        tags: ${{ secrets.DOCKER_USR }}/fre-nc-tools-ci:latest
+    - name: Run Tests
+      run: docker run -u root --entrypoint "/bin/sh" fre-nc-tools-ci /build.sh
