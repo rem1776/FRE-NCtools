@@ -1,9 +1,9 @@
 #!/usr/bin/env bats
 # test regrid ocean restart file 
-
+# Exactly the same as Test24, but with a tolerance added to nccmp 
+# in order to pass with small answer differences from gcc 
 @test "Test fregrid ocean data" {
 
-  skip "Test fails with gcc compiler"
   if [ ! -d "Test24" ] 
   then
   		mkdir Test24
@@ -50,7 +50,7 @@
    run nccmp -V
    [ "$status" -eq 0 ]
 
-   run nccmp -d ocean_temp_salt.res.latlon.nc  $top_srcdir/t/Test20-reference/ocean_temp_salt.res.latlon.nc
+   run nccmp -d -t 0.000001 ocean_temp_salt.res.latlon.nc  $top_srcdir/t/Test20-reference/ocean_temp_salt.res.latlon.nc
    [ "$status" -eq 0 ]
 
    [ -e latlon_mosaic.nc ]
