@@ -3,10 +3,17 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Build Container
-      run: docker build . -t fre-nctools
-    - name: Run Tests
-      run: docker run -u root --entrypoint "/bin/sh" fre-nctools /build.sh
+    strategy:
+      matrix:
+        with_mpi: ['','--with-mpi']
+      env:
+        MPI: ${{ matrix.with_mpi }}
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build Container
+        run: |
+          if [[ "$MPI" != "" ]]; then sed -i 's/autoconf/autoconf libopenmpi-dev openmpi-bin/' Dockerfile; fi
+          docker build . -t fre-nctools
+      - name: Run Tests
+        run: docker run -u root --entrypoint "/bin/sh" fre-nctools /build.sh
