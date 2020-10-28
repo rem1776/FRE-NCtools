@@ -20,6 +20,9 @@ jobs:
         docker build . -t fre-nctools$MPI
     - name: Build and run tests
       run: docker run -u root --entrypoint "/bin/sh" --env MPI fre-nctools$MPI /build.sh
+    - name: Copy log file
+      if: failure()
+      run: docker cp fre-nctools$MPI:/t/test-suite.log t/test-suite.log
     - name: Save log file on failure
       uses: actions/upload-artifact@v2
       if: failure()
