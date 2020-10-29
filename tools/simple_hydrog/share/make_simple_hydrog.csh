@@ -10,7 +10,7 @@
 #    -- add GLCC waterbod fractions
 # =========================================================================
 
-if (`gfdl_platform` == "hpcs-csc") then
+if ( "`which gfdl_platform 2>/dev/null`" != "" && `gfdl_platform` == "hpcs-csc") then
     wipetmp
 else
     if ($?TMPDIR) then
