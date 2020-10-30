@@ -22,12 +22,10 @@ jobs:
       run: docker run -u root --entrypoint "/bin/sh" --env MPI --name container$MPI fre-nctools$MPI /build.sh
     - name: Copy log file
       if: failure()
-      run: |
-        docker container inspect container$MPI
-        docker cp container$MPI:t/test-suite.log /test-suite.log
+      run: docker cp container$MPI:t/test-suite.log test-suite.log
     - name: Save log file on failure
       uses: actions/upload-artifact@v2
       if: failure()
       with:
           name: test-suite${{ matrix.with_mpi}}.log
-          path: /test-suite.log
+          path: test-suite.log
