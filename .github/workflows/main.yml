@@ -16,6 +16,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Build container
       run: |
+        git lfs pull
         if [[ "$MPI" != "" ]]; then sed -i 's/autoconf/autoconf libopenmpi-dev openmpi-bin/' Dockerfile; fi
         docker build . -t fre-nctools$MPI
     - name: Build and run tests
