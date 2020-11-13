@@ -2,6 +2,10 @@
 
 @test "remap data from C48 to regular lat-lon grid" {
 
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test05" ] 
   then
   		mkdir Test05

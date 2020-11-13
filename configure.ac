@@ -74,6 +74,15 @@ AC_CHECK_PROGS(PROVE, [prove])
 
 AM_CONDITIONAL([WITH_CHECK_PROGS], [test -n "$PROVE" -a -n "$BATS"])
 
+# check for git lfs
+AC_CHECK_PROGS([GIT_LFS], [git-lfs], [na])
+if test "$GIT_LFS" = "na"; then
+  AC_MSG_RESULT([Warning: skipping unit tests that require Git LFS files])
+  AM_CONDITIONAL([LFS_INSTALLED], false)
+else
+  AM_CONDITIONAL([LFS_INSTALLED], true)
+fi
+
 # Check for library
 AX_LIB_NETCDF()
 if test "$with_netcdf" = "no"; then

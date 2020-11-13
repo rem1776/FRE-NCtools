@@ -3,6 +3,10 @@
 
 @test "Test fregrid ocean data" {
 
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test20" ] 
   then
   		mkdir Test20

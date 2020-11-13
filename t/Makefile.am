@@ -1,4 +1,12 @@
-TESTS_ENVIRONMENT = top_srcdir=$(abs_top_srcdir); export top_srcdir;\
+#skip tests if missing input files
+if LFS_INSTALLED
+skipLFS=""
+else
+skipLFS="skip"
+endif
+
+TESTS_ENVIRONMENT = top_srcdir=$(abs_top_srcdir); export top_srcdir; \
+    skip_lfs=$(skipLFS); export skip_lfs; \
     for d in $$( find $(abs_top_builddir)/postprocessing $(abs_top_builddir)/tools -mindepth 1 -not -path '*/\.*' -type d ); do \
       PATH="$$d"'$(PATH_SEPARATOR)'"$$PATH"; \
     done;

@@ -3,6 +3,10 @@
 # same as Test24 except checks result with float tolerance, added in for compatibility with gcc
 @test "Test fregrid ocean data" {
 
+  if test "x${skip_lfs}" = "xskip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test26" ] 
   then
   		mkdir Test26

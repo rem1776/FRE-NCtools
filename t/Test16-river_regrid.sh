@@ -3,6 +3,10 @@
 
 @test "Test  remap runoff data from regular lat-lon grid onto cm2m grid" {
 
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test16" ] 
   then
   		mkdir Test16

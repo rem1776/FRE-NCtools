@@ -2,6 +2,10 @@
 
 @test "Wrapper complete hydrology test" {
 
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test25" ]
   then
                 mkdir Test25

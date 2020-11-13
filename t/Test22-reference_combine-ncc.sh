@@ -1,6 +1,11 @@
 #!/usr/bin/env bats
 
 @test "reference combine-ncc combines comparison to bronx-16 stored copy" {
+
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test22" ] 
   then
   mkdir Test22

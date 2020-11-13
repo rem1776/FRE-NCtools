@@ -2,6 +2,11 @@
 # Test remap_land: remap land restart files.
 
 @test "Test remap_land: remap land restart files" {
+
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
+
   if [ ! -d "Test10" ] 
   then
   		mkdir Test10
