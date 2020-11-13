@@ -3,7 +3,10 @@
 #             for regional output
 
 @test "Test make_regional_mosaic" {
-  skip "TO DO: Files are too large" 
+
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
 
   if [ ! -d "Test11" ] 
   then
