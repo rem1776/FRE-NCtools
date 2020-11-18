@@ -16,10 +16,11 @@
   cd Test11
   cp $top_srcdir/t/Test11-input/* . 
 
-  ncgen -o rregionatmos_4xdaily_eq_avg.tile2.nc rregionatmos_4xdaily_eq_avg.tile2.cdl
-  ncgen -o rregionatmos_4xdaily_eq_avg.tile3.nc rregionatmos_4xdaily_eq_avg.tile3.cdl
-  ncgen -o rregionatmos_4xdaily_eq_avg.tile5.nc rregionatmos_4xdaily_eq_avg.tile5.cdl
-  ncgen -o rregionatmos_4xdaily_eq_avg.tile6.nc rregionatmos_4xdaily_eq_avg.tile6.cdl
+  # missing .cdl files
+  #ncgen -o rregionatmos_4xdaily_eq_avg.tile2.nc rregionatmos_4xdaily_eq_avg.tile2.cdl
+  #ncgen -o rregionatmos_4xdaily_eq_avg.tile3.nc rregionatmos_4xdaily_eq_avg.tile3.cdl
+  #ncgen -o rregionatmos_4xdaily_eq_avg.tile5.nc rregionatmos_4xdaily_eq_avg.tile5.cdl
+  #ncgen -o rregionatmos_4xdaily_eq_avg.tile6.nc rregionatmos_4xdaily_eq_avg.tile6.cdl
 
   run command make_regional_mosaic \
 		--global_mosaic C192-rot-120.-0.-r1_mosaic.nc \
