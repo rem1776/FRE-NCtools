@@ -2,7 +2,10 @@
 # test remap ocean restart file from CM2.1 to CM2.5
 
 @test "Test remap ocean restart file" {
-  skip "TO DO: the input files needed are too large" 
+
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS not installed; missing test input files"
+  fi
 
   if [ ! -d "Test14" ] 
   then

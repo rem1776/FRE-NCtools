@@ -74,9 +74,9 @@ AC_CHECK_PROGS(PROVE, [prove])
 
 AM_CONDITIONAL([WITH_CHECK_PROGS], [test -n "$PROVE" -a -n "$BATS"])
 
-# check for git lfs
+# check for git lfs and if lfs files are present
 AC_CHECK_PROGS([GIT_LFS], [git-lfs], [na])
-if test "$GIT_LFS" = "na"; then
+if test "$GIT_LFS" = "na" && test `stat -c %b t/Test25-input/topog.nc` -lt 200 ; then
   AC_MSG_RESULT([Warning: skipping unit tests that require Git LFS files])
   AM_CONDITIONAL([LFS_INSTALLED], false)
 else
