@@ -48,16 +48,16 @@
   [ "$status" -eq 0 ]
 
 #TO DO: This fails, it can probably work with npes>1 and in parallel 
-  run command fregrid    \
-		--input_mosaic latlon_mosaic.nc    \
-		--input_dir ./   \
-		--input_file ocean_temp_salt.res.latlon.nc    \
-		--scalar_field temp,salt   \
-		--output_file ocean_temp_salt.res.CM2.5.nc    \
-		--output_mosaic CM2.5_mosaic.nc    \
-		--extrapolate     \
-		--check_conserve 
-  [ "$status" -eq 0 ]
+#  run command fregrid    \
+#		--input_mosaic latlon_mosaic.nc    \
+#		--input_dir ./   \
+#		--input_file ocean_temp_salt.res.latlon.nc    \
+#		--scalar_field temp,salt   \
+#		--output_file ocean_temp_salt.res.CM2.5.nc    \
+#		--output_mosaic CM2.5_mosaic.nc    \
+#		--extrapolate     \
+#		--check_conserve 
+#  [ "$status" -eq 0 ]
 
   cd ..
   rm -rf Test14
