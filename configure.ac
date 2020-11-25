@@ -53,7 +53,6 @@ if test ! -z "$FC_CRAY_POINTER_FLAG"; then
    FCFLAGS="$FCFLAGS $FC_CRAY_POINTER_FLAG"
 fi
 
-
 AC_CHECK_PROGS(ASCIIDOC, [asciidoc])
 if test -n "$ASCIIDOC"; then
   AC_MSG_CHECKING([for asciidoc version])
@@ -74,13 +73,20 @@ AC_CHECK_PROGS(PROVE, [prove])
 
 AM_CONDITIONAL([WITH_CHECK_PROGS], [test -n "$PROVE" -a -n "$BATS"])
 
-# check for git lfs and if lfs files are present
+# add flag for to override skipping lfs tests
+AC_ARG_ENABLE(lfs_tests, 
+	[--enable-lfs-tests	override skipping tests if git lfs not installed],
+	enable_lfs_tests=$enableval,
+        enable_lfs_tests="" )
+
+# use flag if present, otherwise only enable if lfs is installed
 AC_CHECK_PROGS([GIT_LFS], [git-lfs], [na])
-if test "$GIT_LFS" = "na" && test `stat -c %b t/Test25-input/topog.nc` -lt 200 ; then
-  AC_MSG_RESULT([Warning: skipping unit tests that require Git LFS files])
-  AM_CONDITIONAL([LFS_INSTALLED], false)
-else
+if test "$enable_lfs_tests" = "yes" ; then
   AM_CONDITIONAL([LFS_INSTALLED], true)
+elif test "$GIT_LFS" = "git-lfs" && test "$enable_lfs_tests" = "" ; then
+  AM_CONDITIONAL([LFS_INSTALLED], true)
+else
+  AM_CONDITIONAL([LFS_INSTALLED], false)
 fi
 
 # Check for library
@@ -141,3 +147,7 @@ AC_CONFIG_FILES([Makefile
 
 ])
 AC_OUTPUT
+
+if test "$enable_lfs_tests" = "no" || test "$GIT_LFS" = "na"; then
+  AC_MSG_RESULT([Warning: unit tests that require Git LFS files will be skipped (can be enabled with --enable-lfs-tests)])
+fi

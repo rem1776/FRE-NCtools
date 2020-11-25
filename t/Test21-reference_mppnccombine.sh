@@ -3,7 +3,7 @@
 @test " refernce mppnccombine combines comparison to bronx-16 stored copy" {
 
   if test "${skip_lfs}" = "skip"; then
-    skip "Git LFS not installed; missing test input files"
+    skip "Git LFS input tests disabled"
   fi
 
   if [ ! -d "Test21" ] 

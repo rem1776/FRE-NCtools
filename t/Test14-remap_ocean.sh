@@ -4,7 +4,7 @@
 @test "Test remap ocean restart file" {
 
   if test "${skip_lfs}" = "skip"; then
-    skip "Git LFS not installed; missing test input files"
+    skip "Git LFS input tests disabled"
   fi
 
   if [ ! -d "Test14" ] 

@@ -4,7 +4,7 @@
 @test "Test fregrid ocean data" {
 
   if test "x${skip_lfs}" = "xskip"; then
-    skip "Git LFS not installed; missing test input files"
+    skip "Git LFS input tests disabled"
   fi
 
   if [ ! -d "Test26" ] 

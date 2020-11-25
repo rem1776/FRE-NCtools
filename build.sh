@@ -1,5 +1,5 @@
 #!/bin/bash
-#Builds FRE-NCtools and runs regression tests
+#Builds FRE-NCtools and runs regression tests for CI
 autoreconf -i configure.ac
-./configure $MPI
+./configure $MPI --enable-lfs-tests
 make -j check LOG_DRIVER_FLAGS=--comments

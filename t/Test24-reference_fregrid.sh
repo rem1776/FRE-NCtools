@@ -3,6 +3,10 @@
 
 @test "Test fregrid ocean data" {
 
+  if test "${skip_lfs}" = "skip"; then
+    skip "Git LFS input tests disabled"
+  fi
+
   if [ "$CC" != "icc" ]; then skip "Test fails reference check without icc"; fi
   if [ ! -d "Test24" ] 
   then
