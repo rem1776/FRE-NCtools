@@ -90,6 +90,12 @@ set river_network_ext_file = $share_dir/river_network_mrg_0.5deg_ad3nov_fill_coa
 # set path for GLCC data (waterbod)
 set glcc_file = $share_dir/gigbp2_0ll.nc
 
+# check if lfs files were downloaded
+if ((`stat -c %s $river_network_ext_file` < 500) && (`stat -c %s $glcc_file` < 500)) then
+	echo "Required input netCDF files not found in $share_dir. Files can be downloaded when cloned/pulled with git LFS client"
+	exit
+endif 
+
 echo River network input dataset: $river_network_ext_file
 echo GLCC input dataset: $glcc_file
 
