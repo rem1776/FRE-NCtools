@@ -6,7 +6,7 @@
 @test "Test mppncscatter and  mppnccombine" {
 
   if test "${skip_lfs}" = "skip"; then
-    skip "Git LFS not installed; missing test input files"
+    skip "Git LFS input tests disabled" 
   fi
   
   if [ ! -d "Test12" ] 

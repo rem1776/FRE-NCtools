@@ -53,6 +53,7 @@ if test ! -z "$FC_CRAY_POINTER_FLAG"; then
    FCFLAGS="$FCFLAGS $FC_CRAY_POINTER_FLAG"
 fi
 
+
 AC_CHECK_PROGS(ASCIIDOC, [asciidoc])
 if test -n "$ASCIIDOC"; then
   AC_MSG_CHECKING([for asciidoc version])
@@ -148,6 +149,6 @@ AC_CONFIG_FILES([Makefile
 ])
 AC_OUTPUT
 
-if test "$enable_lfs_tests" = "no" || test "$GIT_LFS" = "na"; then
-  AC_MSG_RESULT([Warning: unit tests that require Git LFS files will be skipped (can be enabled with --enable-lfs-tests)])
+if test "$GIT_LFS" = "na" && test "$enable_lfs_tests" = ""; then
+  AC_MSG_RESULT([Warning: git LFS not installed, unit tests that require git LFS input files will be skipped])
 fi
