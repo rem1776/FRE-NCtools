@@ -1,2 +1,2 @@
 [lfs]
-	url = https://fms_rocks:2020OMG@data1.gfdl.noaa.gov/lfs
+	url = http://127.0.0.1:8080/rem1776/FRE-NCtools
