@@ -116,8 +116,23 @@
 		--ocean_topog  topog.nc \
 		--check \
 		--area_ratio_thresh 1.e-10 \
+    --mosaic_name grid_spec
   [ "$status" -eq 0 ]
-
+  
+    [ ! -d parallel ] && mkdir parallel
+    cd parallel
+ 
+    run command mpirun -n 4 make_coupler_mosaic_parallel \
+                 --atmos_mosaic ../C48_mosaic.nc \
+                 --ocean_mosaic ../ocean_mosaic.nc \
+                 --ocean_topog  ../topog.nc \
+                 --mosaic_name grid_spec  \
+                 --area_ratio_thresh 1.e-10
+    [ "$status" -eq 0 ]
+    # compare any created files to non-parallel (exclude directory differences)
+    nccmp -md --exclude=atm_mosaic_dir --exclude=lnd_mosaic_dir --exclude=ocn_mosaic_dir \
+              --exclude=ocn_topog_dir grid_spec.nc ../grid_spec.nc
+  
 #TO DO: Skipping this for now because it fails 
 #  run command cd parallel
 
@@ -130,6 +145,6 @@
 #  [ "$status" -eq 0 ]
 
 #Remove the workdir 
-  cd ..
+  cd ../..
   rm -rf Test03
 }
