@@ -105,7 +105,7 @@ load test_utils
 		--mosaic_name grid_spec
 
 #Make coupler mosaic with parallel
-  if [ -z "$skip_mpi" ] && [ -z "$CI" ]; then
+  if [ -z "$skip_mpi" ] ; then
       [ ! -d parallel ] && mkdir parallel
       cd parallel
 

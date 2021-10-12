@@ -115,7 +115,7 @@ ncgen -o OCCAM_p5degree.nc $BATS_TEST_DIRNAME/Test03-input/OCCAM_p5degree.ncl
 		--tile_file land_grid.tile1.nc,land_grid.tile2.nc,land_grid.tile3.nc,land_grid.tile4.nc,land_grid.tile5.nc,land_grid.tile6.nc
 
 # MPI only
-  if [ -z "$skip_mpi" ] && [ -z "$CI" ]; then
+  if [ -z "$skip_mpi" ] ; then
 
       [ -z "$CI" ] && root_flag="" || root_flag="--allow-run-as-root"
       #make the coupler_mosaic
