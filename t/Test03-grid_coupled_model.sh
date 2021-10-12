@@ -67,8 +67,9 @@ load test_utils
 
 # MPI only tests
 # This test only fails within the CI
-  if [ -z "$skip_mpi" ] && [ -z "$CI" ]; then
-       mpirun -n 2 make_topog_parallel \
+  if [ -z "$skip_mpi" ]; then
+       [ -z "$CI" ] && root_flag="" || root_flag="--allow-run-as-root"
+       mpirun $root_flag -n 2 make_topog_parallel \
 		--mosaic ocean_mosaic.nc \
 		--topog_type realistic \
 		--topog_file OCCAM_p5degree.nc \
@@ -108,7 +109,7 @@ load test_utils
       [ ! -d parallel ] && mkdir parallel
       cd parallel
 
-       mpirun -n 4 make_coupler_mosaic_parallel \
+       mpirun $root_flag -n 4 make_coupler_mosaic_parallel \
 		--atmos_mosaic ../C48_mosaic.nc \
 		--ocean_mosaic ../ocean_mosaic.nc \
 		--ocean_topog  ../topog.nc \

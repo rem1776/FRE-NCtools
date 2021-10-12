@@ -47,14 +47,16 @@ load test_utils
 
 # parallel call
   if [ -z "$skip_mpi" ]; then
-     mpirun -n 4 fregrid_parallel \
+     # CI needs root flag for mpi
+     [ -z "$CI" ] && root_flag="" || root_flag="--allow-run-as-root" 
+     mpirun $root_flag -n 4 fregrid_parallel \
 		--input_mosaic C180_mosaic.nc \
 		--interp_method conserve_order1 \
 		--nlon 144 \
 		--nlat 90 \
 		--remap_file remap_file.nc
 
-     mpirun -n 4 fregrid_parallel  \
+     mpirun $root_flag -n 4 fregrid_parallel  \
 		--input_mosaic C180_mosaic.nc  \
 		--interp_method conserve_order1  \
 		--nlon 144  \
