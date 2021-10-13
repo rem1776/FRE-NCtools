@@ -117,14 +117,14 @@ ncgen -o OCCAM_p5degree.nc $BATS_TEST_DIRNAME/Test03-input/OCCAM_p5degree.ncl
 # MPI only
   if [ -z "$skip_mpi" ] ; then
       #make the coupler_mosaic
-       mpirun -n 8 make_coupler_mosaic_parallel --atmos_mosaic atmos_mosaic.nc \
+       mpirun -n 16 make_coupler_mosaic_parallel --atmos_mosaic atmos_mosaic.nc \
                          --land_mosaic land_mosaic.nc --ocean_mosaic ocean_mosaic.nc \
                          --ocean_topog  topog.nc --interp_order 1 --mosaic_name grid_spec --check
 
       #check reproducing ability between processor count for make_coupler_mosaic
       [ ! -d parallel ] && mkdir parallel
       cd parallel
-      mpirun -n 16 make_coupler_mosaic_parallel --atmos_mosaic ../atmos_mosaic.nc \
+      mpirun -n 32 make_coupler_mosaic_parallel --atmos_mosaic ../atmos_mosaic.nc \
                         --land_mosaic ../land_mosaic.nc --ocean_mosaic ../ocean_mosaic.nc \
                         --ocean_topog  ../topog.nc --interp_order 1 --mosaic_name grid_spec
       # directory paths should differ
