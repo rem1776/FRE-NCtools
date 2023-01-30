@@ -62,11 +62,6 @@ AS_IF([test ${enable_ocean_model_grid_generator:-yes} = yes],
 AM_CONDITIONAL([ENABLE_OCEAN_MODEL_GRID_GENERATOR],
   [test $enable_ocean_model_grid_generator = yes])
 
-AC_ARG_WITH([acc],
-  [AS_HELP_STRING([--with-acc],
-    [build fregrid with OpenACC flags(for nvc compiler only)])])
-
-
 AC_PROG_CC([icc gcc])
 AM_PROG_CC_C_O
 ## When autoconf v2.70 is more available, this can be replaced with:
