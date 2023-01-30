@@ -24,6 +24,11 @@ endif
 
 AM_CFLAGS = -I$(top_srcdir)/tools/libfrencutils \
             $(NETCDF_CFLAGS)
+
+#if WITH_GPU
+AM_CFLAGS += -tp haswell -acc -ta=nvidia:managed -Minfo -Mbounds -Mnoinline 
+#endif
+
 LDADD = $(NETCDF_LDFLAGS) $(NETCDF_LIBS) $(RPATH_FLAGS)
 
 fregrid_SOURCES = bilinear_interp.c \

@@ -1,27 +1,9 @@
-/***********************************************************************
- *                   GNU Lesser General Public License
- *
- * This file is part of the GFDL FRE NetCDF tools package (FRE-NCTools).
- *
- * FRE-NCtools is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
- * your option) any later version.
- *
- * FRE-NCtools is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with FRE-NCTools.  If not, see
- * <http://www.gnu.org/licenses/>.
- **********************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <netcdf.h>
 #include <math.h>
+#include <time.h>
 #include "constant.h"
 #include "globals.h"
 #include "create_xgrid.h"
@@ -37,10 +19,10 @@
 #define  TOLERANCE  (1.e-10)
 /*******************************************************************************
   void setup_conserve_interp
-  Setup the interpolation weight for conservative interpolation
+  Setup the interpolation weight for conservative interpolation 
 *******************************************************************************/
 void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles_out,
-			   Grid_config *grid_out, Interp_config *interp, unsigned int opcode)
+			   Grid_config *grid_out, Interp_config *interp, unsigned int opcode) 
 {
   int    n, m, i, ii, jj, nx_in, ny_in, nx_out, ny_out, tile;
   size_t nxgrid, nxgrid2, nxgrid_prev;
@@ -48,7 +30,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
   int   *tmp_t_in=NULL, *tmp_i_in=NULL, *tmp_j_in=NULL, *tmp_i_out=NULL, *tmp_j_out=NULL;
   double *tmp_di_in, *tmp_dj_in;
   double *xgrid_area=NULL, *tmp_area=NULL, *xgrid_clon=NULL, *xgrid_clat=NULL;
-
+  
   double garea;
   typedef struct{
     double *area;
@@ -57,14 +39,17 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
   } CellStruct;
   CellStruct *cell_in;
 
+  double time_nxgrid=0;
+  clock_t time_start, time_end;
+  
   garea = 4*M_PI*RADIUS*RADIUS;
-
+  
   if( opcode & READ) {
     for(n=0; n<ntiles_out; n++) {
       if( interp[n].file_exist ) { /* reading from file */
 	int *t_in, *ind;
 	int fid, vid;
-
+	
 	nxgrid     = read_mosaic_xgrid_size(interp[n].remap_file);
 	i_in       = (int    *)malloc(nxgrid   * sizeof(int   ));
 	j_in       = (int    *)malloc(nxgrid   * sizeof(int   ));
@@ -74,14 +59,14 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	if(opcode & CONSERVE_ORDER2) {
 	  xgrid_clon = (double *)malloc(nxgrid   * sizeof(double));
 	  xgrid_clat = (double *)malloc(nxgrid   * sizeof(double));
-	}
+	}    
 	t_in       = (int    *)malloc(nxgrid*sizeof(int   ));
 	ind        = (int    *)malloc(nxgrid*sizeof(int   ));
 	if(opcode & CONSERVE_ORDER1)
 	  read_mosaic_xgrid_order1(interp[n].remap_file, i_in, j_in, i_out, j_out, xgrid_area);
 	else
 	  read_mosaic_xgrid_order2(interp[n].remap_file, i_in, j_in, i_out, j_out, xgrid_area, xgrid_clon, xgrid_clat);
-
+	
 	/*--- rescale the xgrid area */
 	for(i=0; i<nxgrid; i++) xgrid_area[i] *= garea;
 	fid = mpp_open(interp[n].remap_file, MPP_READ);
@@ -117,7 +102,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	    interp[n].di_in[i] = xgrid_clon[ind[i]];
 	    interp[n].dj_in[i] = xgrid_clat[ind[i]];
 	  }
-	}
+	}	
 	free(t_in);
 	free(ind);
       }
@@ -147,7 +132,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
     }
     for(n=0; n<ntiles_out; n++) {
       nx_out    = grid_out[n].nxc;
-      ny_out    = grid_out[n].nyc;
+      ny_out    = grid_out[n].nyc;      
       interp[n].nxgrid = 0;
       for(m=0; m<ntiles_in; m++) {
 	double *mask;
@@ -158,7 +143,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	ny_in = grid_in[m].ny;
 
 	mask = (double *)malloc(nx_in*ny_in*sizeof(double));
-	for(i=0; i<nx_in*ny_in; i++) mask[i] = 1.0;
+	for(i=0; i<nx_in*ny_in; i++) mask[i] = 1.0; 
 
 	if(opcode & GREAT_CIRCLE) {
 	  nxgrid = create_xgrid_great_circle(&nx_in, &ny_in, &nx_out, &ny_out, grid_in[m].lonc,
@@ -180,9 +165,9 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 
 	  }
 	  jstart = max(0, jstart-1);
-	  jend   = min(ny_in-1, jend+1);
+	  jend   = min(ny_in-1, jend+1);	
 	  ny_now = jend-jstart+1;
-
+	
 	  if(opcode & CONSERVE_ORDER1) {
 	    nxgrid = create_xgrid_2dx2d_order1(&nx_in, &ny_now, &nx_out, &ny_out, grid_in[m].lonc+jstart*(nx_in+1),
 					       grid_in[m].latc+jstart*(nx_in+1),  grid_out[n].lonc,  grid_out[n].latc,
@@ -193,18 +178,23 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	    int g_nxgrid;
 	    int    *g_i_in, *g_j_in;
 	    double *g_area, *g_clon, *g_clat;
-
+	  
+   time_start = clock();
 	    nxgrid = create_xgrid_2dx2d_order2(&nx_in, &ny_now, &nx_out, &ny_out, grid_in[m].lonc+jstart*(nx_in+1),
 					       grid_in[m].latc+jstart*(nx_in+1),  grid_out[n].lonc,  grid_out[n].latc,
 					       mask, i_in, j_in, i_out, j_out, xgrid_area, xgrid_clon, xgrid_clat);
-	    for(i=0; i<nxgrid; i++) j_in[i] += jstart;
+   printf("nxgrid, m, & n is: %d %d %d\n",nxgrid, m, n);
+   time_end = clock();
+   time_nxgrid += 1.0 * (time_end - time_start)/CLOCKS_PER_SEC;
 
+	    for(i=0; i<nxgrid; i++) j_in[i] += jstart;
+	  
 	    /* For the purpose of bitiwise reproducing, the following operation is needed. */
 	    g_nxgrid = nxgrid;
 	    mpp_sum_int(1, &g_nxgrid);
 	    if(g_nxgrid > 0) {
 	      g_i_in = (int    *)malloc(g_nxgrid*sizeof(int   ));
-	      g_j_in = (int    *)malloc(g_nxgrid*sizeof(int   ));
+	      g_j_in = (int    *)malloc(g_nxgrid*sizeof(int   ));			   
 	      g_area = (double *)malloc(g_nxgrid*sizeof(double));
 	      g_clon = (double *)malloc(g_nxgrid*sizeof(double));
 	      g_clat = (double *)malloc(g_nxgrid*sizeof(double));
@@ -293,7 +283,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	      tmp_dj_in  = interp[n].dj_in;
 	      interp[n].di_in   = (double *)malloc(interp[n].nxgrid*sizeof(double));
 	      interp[n].dj_in   = (double *)malloc(interp[n].nxgrid*sizeof(double));
-	      for(i=0; i<nxgrid_prev; i++) {
+	      for(i=0; i<nxgrid_prev; i++) { 
 		interp[n].di_in [i] = tmp_di_in [i];
 		interp[n].dj_in [i] = tmp_dj_in [i];
 	      }
@@ -316,6 +306,8 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	}  /* if(nxgrid>0) */
       }
     }
+    print_time("time_nxgrid", time_nxgrid);
+
     if(opcode & CONSERVE_ORDER2) {
       /* subtrack the grid_in clon and clat to get the distance between xgrid and grid_in */
       for(n=0; n<ntiles_in; n++) {
@@ -345,7 +337,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	      cell_in[n].clon[ii] = clon/grid_in[n].cell_area[ii];
 	      cell_in[n].clat[ii] = clat/grid_in[n].cell_area[ii];
 	    }
-	  }
+	  } 
 	}
       }
       for(n=0; n<ntiles_out; n++) {
@@ -368,7 +360,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
     if( opcode & WRITE) { /* write out remapping information */
       for(n=0; n<ntiles_out; n++) {
 	int nxgrid;
-
+	
 	nxgrid = interp[n].nxgrid;
 	mpp_sum_int(1, &nxgrid);
 	if(nxgrid > 0) {
@@ -376,9 +368,9 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	  int    fid, dim_string, dim_ncells, dim_two, dims[4];
 	  int    id_xgrid_area, id_tile1_dist;
 	  int    id_tile1_cell, id_tile2_cell, id_tile1;
-	  int    *gdata_int, *ldata_int;
+	  int    *gdata_int, *ldata_int;	  
 	  double *gdata_dbl;
-
+	  
 	  fid = mpp_open( interp[n].remap_file, MPP_WRITE);
 	  dim_string = mpp_def_dim(fid, "string", STRING);
 	  dim_ncells = mpp_def_dim(fid, "ncells", nxgrid);
@@ -409,7 +401,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	  for(i=0; i<nxgrid; i++) gdata_int[i]++;
 	  mpp_put_var_value_block(fid, id_tile1_cell, start, nwrite, gdata_int);
 
-          for(i=0; i<interp[n].nxgrid; i++) ldata_int[i] = interp[n].i_out[i] + grid_out[n].isc + 1;
+          for(i=0; i<interp[n].nxgrid; i++) ldata_int[i] = interp[n].i_out[i] + grid_out[n].isc + 1; 
 	  mpp_gather_field_int(interp[n].nxgrid, ldata_int, gdata_int);
 	  mpp_put_var_value_block(fid, id_tile2_cell, start, nwrite, gdata_int);
 
@@ -418,17 +410,17 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	  start[1] = 1;
 	  mpp_put_var_value_block(fid, id_tile1_cell, start, nwrite, gdata_int);
 
-          for(i=0; i<interp[n].nxgrid; i++) ldata_int[i] = interp[n].j_out[i] + grid_out[n].jsc + 1;
+          for(i=0; i<interp[n].nxgrid; i++) ldata_int[i] = interp[n].j_out[i] + grid_out[n].jsc + 1; 	  
 	  mpp_gather_field_int(interp[n].nxgrid, ldata_int, gdata_int);
 	  mpp_put_var_value_block(fid, id_tile2_cell, start, nwrite, gdata_int);
 
 	  free(gdata_int);
 	  if(interp[n].nxgrid>0)free(ldata_int);
-
+	  
 	  gdata_dbl = (double *)malloc(nxgrid*sizeof(double));
 	  mpp_gather_field_double(interp[n].nxgrid, interp[n].area, gdata_dbl);
 	  mpp_put_var_value(fid, id_xgrid_area, gdata_dbl);
-
+	  
 	  if(opcode & CONSERVE_ORDER2) {
 	    start[1] = 0;
 	    mpp_gather_field_double(interp[n].nxgrid, interp[n].di_in, gdata_dbl);
@@ -437,7 +429,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	    mpp_gather_field_double(interp[n].nxgrid, interp[n].dj_in, gdata_dbl);
 	    mpp_put_var_value_block(fid, id_tile1_dist, start, nwrite, gdata_dbl);
 	  }
-
+	  
 	  free(gdata_dbl);
 	  mpp_close(fid);
 	}
@@ -451,13 +443,13 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
     int nx1, ny1, max_i, max_j, i, j;
     double max_ratio, ratio_change;
     double *area2;
-
+    
     /* sum over exchange grid to get the area of grid_in */
     nx1  = grid_out[0].nxc;
     ny1  = grid_out[0].nyc;
 
     area2 = (double *)malloc(nx1*ny1*sizeof(double));
-
+    
     for(n=0; n<ntiles_out; n++) {
       for(i=0; i<nx1*ny1; i++) area2[i] = 0;
       for(i=0; i<interp[n].nxgrid; i++) {
@@ -482,13 +474,13 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
       }
       ii = max_j*nx1+max_i;
       printf("The maximum ratio change at (%d,%d) = %g, area1=%g, area2=%g\n", max_i, max_j, max_ratio, grid_out[n].cell_area[ii],area2[ii]);
-
+      
     }
-
+    
     free(area2);
-
+    
   }
-
+      
   free(i_in);
   free(j_in);
   free(i_out);
@@ -496,7 +488,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
   free(xgrid_area);
   if(xgrid_clon) free(xgrid_clon);
   if(xgrid_clat) free(xgrid_clat);
-
+  
 }; /* setup_conserve_interp */
 
 
@@ -520,7 +512,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
   int monotonic;
   int target_grid;
   Monotone_config *monotone_data;
-
+  
   gsum_out = 0;
   interp_method = field_in->var[varid].interp_method;
   halo = 0;
@@ -529,7 +521,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
     halo = 1;
     monotonic = opcode & MONOTONIC;
   }
-
+    
   area_missing = field_in->var[varid].area_missing;
   has_missing = field_in->var[varid].has_missing;
   weight_exist = grid_in[0].weight_exist;
@@ -540,19 +532,19 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 
   missing = -MAXVAL;
   if(has_missing) missing = field_in->var[varid].missing;
-
+  
   if( nz>1 && has_missing ) mpp_error("conserve_interp: has_missing should be false when nz > 1");
   if( nz>1 && cell_measures ) mpp_error("conserve_interp: cell_measures should be false when nz > 1");
-  if( nz>1 && cell_methods == CELL_METHODS_SUM ) mpp_error("conserve_interp: cell_methods should not be sum when nz > 1");
+  if( nz>1 && cell_methods == CELL_METHODS_SUM ) mpp_error("conserve_interp: cell_methods should not be sum when nz > 1");  
   /*  if( nz>1 && monotonic ) mpp_error("conserve_interp: monotonic should be false when nz > 1"); */
-
+  
   if(monotonic) monotone_data = (Monotone_config *)malloc(ntiles_in*sizeof(Monotone_config));
-
+  
   for(m=0; m<ntiles_out; m++) {
     nx2 = grid_out[m].nxc;
     ny2 = grid_out[m].nyc;
     out_area = (double *)malloc(nx2*ny2*nz*sizeof(double));
-    out_miss = (int *)malloc(nx2*ny2*nz*sizeof(int));
+    out_miss = (int *)malloc(nx2*ny2*nz*sizeof(int)); 
     for(i=0; i<nx2*ny2*nz; i++) {
       field_out[m].data[i] = 0.0;
       out_area[i] = 0.0;
@@ -564,15 +556,15 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	  i2   = interp[m].i_out[n];
 	  j2   = interp[m].j_out[n];
 	  i1   = interp[m].i_in [n];
-	  j1   = interp[m].j_in [n];
+	  j1   = interp[m].j_in [n];    
 	  tile = interp[m].t_in [n];
-	  area = interp[m].area [n];
+	  area = interp[m].area [n];	  
 	  nx1  = grid_in[tile].nx;
 	  ny1  = grid_in[tile].ny;
           if(weight_exist) area *= grid_in[tile].weight[j1*nx1+i1];
 	  n1 = j1*nx1+i1;
 	  n0 = j2*nx2+i2;
-
+	  
 	  if( field_in[tile].data[n1] != missing ) {
 	    if( cell_methods == CELL_METHODS_SUM )
 	      area /= grid_in[tile].cell_area[n1];
@@ -594,7 +586,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	  i2   = interp[m].i_out[n];
 	  j2   = interp[m].j_out[n];
 	  i1   = interp[m].i_in [n];
-	  j1   = interp[m].j_in [n];
+	  j1   = interp[m].j_in [n];    
 	  tile = interp[m].t_in [n];
 	  area = interp[m].area [n];
 	  nx1  = grid_in[tile].nx;
@@ -612,7 +604,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	    out_miss[n0] = 1;
 	  }
 	}
-      }
+      } 
     }
     else if(monotonic) {
       int ii, jj;
@@ -627,7 +619,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	monotone_data[n].f_min     = (double *)malloc(nx1*ny1*sizeof(double));
 	for(j=0; j<ny1; j++) for(i=0; i<nx1; i++) {
 	  n1 = j*nx1+i;
-
+	    
 	  monotone_data[n].f_bar_max[n1] = -MAXVAL;
 	  monotone_data[n].f_bar_min[n1] = MAXVAL;
 	  monotone_data[n].f_max[n1]     = -MAXVAL;
@@ -641,8 +633,8 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	    }
 	  }
 	}
-      }
-
+      }      
+      
       xdata = (double *)malloc(interp[m].nxgrid*sizeof(double));
       for(n=0; n<interp[m].nxgrid; n++) {
 	i1   = interp[m].i_in [n];
@@ -685,7 +677,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	n2 = (j1+1)*(nx1+2)+i1+1;
 	f_bar = field_in[tile].data[n2];
 	if(xdata[n] == missing) continue;
-
+	  
 	if( monotone_data[tile].f_max[n1] > monotone_data[tile].f_bar_max[n1] ) {
 	  /* z1l: Due to truncation error, we might get xdata[n] > f_bar_max[n1]. So
 	     we allow some tolerance. What is the suitable tolerance? */
@@ -709,10 +701,10 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	      printf(" n = %d, n1 = %d, xdata = %f, f_bar_min=%f\n", n, n1, xdata[n], monotone_data[tile].f_bar_min[n1]);
 	      mpp_error(" xdata is less than f_bar_min ");
 	    }
-	  }
+	  }	     
 	}
       }
-      for(n=0; n<ntiles_in; n++) {
+      for(n=0; n<ntiles_in; n++) {	
 	free(monotone_data[n].f_bar_max);
 	free(monotone_data[n].f_bar_min);
 	free(monotone_data[n].f_max);
@@ -766,7 +758,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	      if(field_in[tile].area[n1] == area_missing) {
                 printf("name=%s,tile=%d,i1,j1=%d,%d,i2,j2=%d,%d\n",field_in->var[varid].name,tile,i1,j1,i2,j2);
 	        mpp_error("conserve_interp: data is not missing but area is missing");
-              }
+              } 
 	      area *= (field_in[tile].area[n1]/grid_in[tile].cell_area[n1]);
             }
 	    if(field_in[tile].grad_mask[n1]) { /* use zero gradient */
@@ -805,7 +797,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	      area *= (field_in[tile].area[n1]/grid_in[tile].cell_area[n1]);
 	    field_out[m].data[n0] += (field_in[tile].data[n2]+field_in[tile].grad_x[n1]*di
 				      +field_in[tile].grad_y[n1]*dj)*area;
-	    out_area[n0] += area;
+	    out_area[n0] += area;	    
             out_miss[n0] = 1;
 	  }
 	}
@@ -820,22 +812,21 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 
     if ( cell_methods == CELL_METHODS_SUM ) {
       for(i=0; i<nx2*ny2*nz; i++) {
-        if(out_area[i] == 0) {
-          if(out_miss[i] == 0)
-            for(k=0; k<nz; k++) field_out[m].data[k*nx2*ny2+i] = missing;
-          else
-            for(k=0; k<nz; k++) field_out[m].data[k*nx2*ny2+i] = 0.0;
-        }
+        if(out_area[i] == 0)
+	  if(out_miss[i] ==0)
+	    for(k=0; k<nz; k++) field_out[m].data[k*nx2*ny2+i] = missing;
+	  else
+	    for(k=0; k<nz; k++) field_out[m].data[k*nx2*ny2+i] = 0.0;
       }
     }
-    else {
+    else {    
       for(i=0; i<nx2*ny2*nz; i++) {
 	if(out_area[i] > 0)
 	  field_out[m].data[i] /= out_area[i];
 	else if(out_miss[i] == 1)
 	  field_out[m].data[i] = 0.0;
 	else
-	  field_out[m].data[i] = missing;
+	  field_out[m].data[i] = missing;      
       }
 
       if( (target_grid) ) {
@@ -868,7 +859,7 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
     free(out_area);
     free(out_miss);
   }
-
+    
 
   /* conservation check if needed */
   if(opcode & CHECK_CONSERVE) {
@@ -884,14 +875,14 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
         for(j=0; j<ny1; j++) for(i=0; i<nx1; i++) {
   	  dd = field_in[n].data[(j+halo)*(nx1+2*halo)+i+halo];
 	  if(dd != missing) gsum_in += dd*field_in[n].area[j*nx1+i];
-        }
+        }      
       }
       else if ( cell_methods == CELL_METHODS_SUM ) {
         for(j=0; j<ny1; j++) for(i=0; i<nx1; i++) {
 	  dd = field_in[n].data[(j+halo)*(nx1+2*halo)+i+halo];
 	  if(dd != missing) gsum_in += dd;
         }
-      }
+      }     
       else {
         for(k=0; k<nz; k++) for(j=0; j<ny1; j++) for(i=0; i<nx1; i++) {
 	  dd = field_in[n].data[k*(nx1+2*halo)*(ny1+2*halo)+(j+halo)*(nx1+2*halo)+i+halo];
@@ -900,13 +891,13 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
       }
     }
     mpp_sum_double(1, &gsum_out);
-
+    
     if(mpp_pe() == mpp_root_pe()) printf("the flux(data*area) sum of %s: input = %g, output = %g, diff = %g. \n",
 					 field_in->var[varid].name, gsum_in, gsum_out, gsum_out-gsum_in);
-
+    
   }
-
-
+  
+  
 }; /* do_scalar_conserve_interp */
 
 
@@ -914,15 +905,15 @@ void do_scalar_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
  void do_vector_conserve_interp( )
  doing conservative interpolation
 *******************************************************************************/
-void do_vector_conserve_interp(Interp_config *interp, int varid, int ntiles_in, const Grid_config *grid_in, int ntiles_out,
+void do_vector_conserve_interp(Interp_config *interp, int varid, int ntiles_in, const Grid_config *grid_in, int ntiles_out, 
                                const Grid_config *grid_out, const Field_config *u_in,  const Field_config *v_in,
-                               Field_config *u_out, Field_config *v_out, unsigned int opcode)
+                               Field_config *u_out, Field_config *v_out, unsigned int opcode)  
 {
   int          nx1, ny1, nx2, ny2, i1, j1, i2, j2, tile, n, m, i;
   double       area, missing, tmp_x, tmp_y;
   double       *out_area;
 
-  missing = u_in->var[varid].missing;
+  missing = u_in->var[varid].missing;  
   /* first rotate input data */
   for(n = 0; n < ntiles_in; n++) {
     if(grid_in[n].rotate) {
@@ -938,23 +929,23 @@ void do_vector_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
       }
     }
   }
-
+  
   for(m=0; m<ntiles_out; m++) {
     nx2 = grid_out[m].nxc;
     ny2 = grid_out[m].nyc;
     out_area = (double *)malloc(nx2*ny2*sizeof(double));
-
+    
     for(i=0; i<nx2*ny2; i++) {
       u_out[m].data[i] = 0.0;
       v_out[m].data[i] = 0.0;
     }
     for(i=0; i<nx2*ny2; i++) out_area[i] = 0.0;
-
+    
     for(n=0; n<interp[m].nxgrid; n++) {
       i2   = interp[m].i_out[n];
       j2   = interp[m].j_out[n];
       i1   = interp[m].i_in [n];
-      j1   = interp[m].j_in [n];
+      j1   = interp[m].j_in [n];    
       tile = interp[m].t_in [n];
       area = interp[m].area [n];
       nx1  = grid_in[tile].nx;
@@ -989,7 +980,7 @@ void do_vector_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
 	  u_out[m].data[i] = missing;
 	  v_out[m].data[i] = missing;
 	}
-      }
+      }      
     }
     /* rotate the data if needed */
     if(grid_out[m].rotate) {
@@ -1004,5 +995,5 @@ void do_vector_conserve_interp(Interp_config *interp, int varid, int ntiles_in, 
     }
     free(out_area);
   }
-
+  
 }; /* do_vector_conserve_interp */
