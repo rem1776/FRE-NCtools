@@ -101,3 +101,4 @@ tools/simple_hydrog/postp/cp_river_vars
 tools/simple_hydrog/rmvpr/rmv_parallel_rivers
 tools/transfer_to_mosaic_grid/transfer_to_mosaic_grid
 
+tools/ocean_model_grid_generator

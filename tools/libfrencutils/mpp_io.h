@@ -1,26 +1,7 @@
-/***********************************************************************
- *                   GNU Lesser General Public License
- *
- * This file is part of the GFDL FRE NetCDF tools package (FRE-NCTools).
- *
- * FRE-NCtools is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
- * your option) any later version.
- *
- * FRE-NCtools is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with FRE-NCTools.  If not, see
- * <http://www.gnu.org/licenses/>.
- **********************************************************************/
 /****************************************************************
                     mpp_io.h
    This headers defines interface to read and write netcdf file. All the data
-will be written out from root pe.
+will be written out from root pe. 
 
    contact: Zhi.Liang@noaa.gov
 
@@ -83,5 +64,4 @@ int mpp_dim_exist(int fid, const char *dimname);
 int get_great_circle_algorithm(int fid);
 void mpp_set_deflation(int fid_in, int fid_out, int deflation, int shuffle);
 void set_in_format(char *format);
-void reset_in_format(int format);
 #endif

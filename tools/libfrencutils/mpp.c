@@ -1,26 +1,3 @@
-/***********************************************************************
- *                   GNU Lesser General Public License
- *
- * This file is part of the GFDL FRE NetCDF tools package (FRE-NCTools).
- *
- * FRE-NCtools is free software: you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or (at
- * your option) any later version.
- *
- * FRE-NCtools is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with FRE-NCTools.  If not, see
- * <http://www.gnu.org/licenses/>.
- **********************************************************************/
-
-/**
- * \author Zhi Liang
- */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -31,15 +8,14 @@
 #endif
 #include "mpp.h"
 
-//These four fields are defined in the file of mpp_domain.c.
-static int npes, root_pe, pe; 
 
 /****************************************************
          global variables
 *****************************************************/
+int npes, root_pe, pe;
 int *pelist=NULL;
 const int tag = 1;
-#ifdef use_libMPI
+#ifdef use_libMPI  
 MPI_Request *request;
 #endif
 
@@ -51,9 +27,9 @@ MPI_Request *request;
 void mpp_init(int *argc, char ***argv)
 {
   int n;
-
+  
 #ifdef use_libMPI
-  MPI_Init(argc, argv);
+  MPI_Init(argc, argv); 
   MPI_Comm_rank(MPI_COMM_WORLD,&pe);
   MPI_Comm_size(MPI_COMM_WORLD,&npes);
   request = (MPI_Request *)malloc(npes*sizeof(MPI_Request));
@@ -74,9 +50,9 @@ void mpp_init(int *argc, char ***argv)
 
 void mpp_end()
 {
-#ifdef use_libMPI
+#ifdef use_libMPI   
   MPI_Finalize();
-#endif
+#endif  
 } /* mpp_end */
 
 /*****************************************************************
@@ -126,14 +102,14 @@ int* mpp_get_pelist()
 *************************************************************/
 void mpp_sync_self() {
   int n;
-#ifdef use_libMPI
+#ifdef use_libMPI     
   MPI_Status status;
-
+  
   for(n=0; n<npes; n++) {
     if(request[n] != MPI_REQUEST_NULL) MPI_Wait( request+n, &status );
   }
 #endif
-
+  
 }
 
 /************************************************************
@@ -154,15 +130,16 @@ void mpp_sync()
 
 void mpp_send_double(const double* data, int size, int to_pe)
 {
-#ifdef use_libMPI
+#ifdef use_libMPI    
   MPI_Status status;
   /* make sure only one message from pe->to_pe in queue */
   if(request[to_pe] != MPI_REQUEST_NULL) {
     MPI_Wait( request+to_pe, &status );
   }
+    
   MPI_Isend(data, size, MPI_DOUBLE, to_pe, tag, MPI_COMM_WORLD, request+to_pe);
 #endif
-
+  
 }; /* mpp_send_double */
 
 
@@ -173,15 +150,15 @@ void mpp_send_double(const double* data, int size, int to_pe)
 
 void mpp_send_int(const int* data, int size, int to_pe)
 {
-#ifdef use_libMPI
+#ifdef use_libMPI    
   MPI_Status status;
   if(request[to_pe] != MPI_REQUEST_NULL) {
     MPI_Wait( request+to_pe, &status );
-  }
-  /*void* temp_data = data;*/
+  }  
+
   MPI_Isend(data, size, MPI_INT, to_pe, tag, MPI_COMM_WORLD, request+to_pe);
 #endif
-
+  
 }; /* mpp_send_int */
 
 /***********************************************************
@@ -191,10 +168,10 @@ void mpp_send_int(const int* data, int size, int to_pe)
 
 void mpp_recv_double(double* data, int size, int from_pe)
 {
-#ifdef use_libMPI
+#ifdef use_libMPI      
   MPI_Status status;
   MPI_Recv(data, size, MPI_DOUBLE, from_pe, MPI_ANY_TAG, MPI_COMM_WORLD,&status);
-#endif
+#endif  
 }; /* mpp_recv_double */
 
 /***********************************************************
@@ -204,10 +181,10 @@ void mpp_recv_double(double* data, int size, int from_pe)
 
 void mpp_recv_int(int* data, int size, int from_pe)
 {
-#ifdef use_libMPI
+#ifdef use_libMPI      
   MPI_Status status;
   MPI_Recv(data, size, MPI_INT, from_pe, MPI_ANY_TAG, MPI_COMM_WORLD,&status);
-#endif
+#endif  
 }; /* mpp_recv_int */
 
 
@@ -243,7 +220,7 @@ void mpp_sum_double(int count, double *data)
   sum = (double *)malloc(count*sizeof(double));
   MPI_Allreduce(data, sum, count, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   for(i=0; i<count; i++)data[i] = sum[i];
-  free(sum);
+  free(sum);  
 #endif
 
 
@@ -286,18 +263,18 @@ void mpp_max_double(int count, double *data)
 void mpp_error(char *str)
 {
   fprintf(stderr, "Error from pe %d: %s\n", pe, str );
-#ifdef use_libMPI
+#ifdef use_libMPI      
   MPI_Abort(MPI_COMM_WORLD, -1);
 #else
   exit(1);
-#endif
+#endif  
 }; /* mpp_error */
 
 double get_mem_usage(void)
 
 {
   double mem;
-
+  
 #if defined(__sgi) || defined(__aix) || defined(__SX)
 #define RUSAGE_SELF      0         /* calling process */
 #define RUSAGE_CHILDREN  -1        /* terminated child processes */
@@ -331,17 +308,17 @@ double get_mem_usage(void)
        break;
      }
    }
- fclose(fp);
+ fclose(fp); 
 #endif
 
  return mem;
-
+ 
 }
 
 void print_time(const char* text, double t)
 {
   double tmin, tmax, tavg;
-
+  
   tmin=t;
   tmax=t;
   tavg=t;
@@ -350,7 +327,7 @@ void print_time(const char* text, double t)
   mpp_sum_double(1, &tavg);
   tavg /= mpp_npes();
   if( mpp_pe() == mpp_root_pe() ) {
-    printf("Running time for %s, min=%g, max=%g, avg=%g\n", text, tmin, tmax, tavg);
+    printf("Running time for %s, min=%g, max=%g, avg=%g\n", text, tmin, tmax, tavg); 
   }
 
 }
@@ -370,6 +347,7 @@ void print_mem_usage(const char* text)
     mpp_sum_double(1, &mavg);
     mavg /= mpp_npes();
     if( mpp_pe() == mpp_root_pe() ) {
-      printf("Memuse(MB) at %s, min=%g, max=%g, avg=%g\n", text, mmin, mmax, mavg);
+      printf("Memuse(MB) at %s, min=%g, max=%g, avg=%g\n", text, mmin, mmax, mavg); 
     }
 }
+      
