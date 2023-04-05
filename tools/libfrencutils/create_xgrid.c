@@ -19,6 +19,7 @@
  **********************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <math.h>
 #include "mosaic_util.h"
 #include "create_xgrid.h"
@@ -898,7 +899,13 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
   int ij1, ij2, i1, j1;
   int mxxgrid;
 
+  int num_gangs;
+  int nsize;
+  int delta_gang;
+  double **xgrid_area_tmp, **xgrid_clon_tmp, **xgrid_clat_tmp;
+  int **i_in_tmp, **j_in_tmp, **i_out_tmp, **j_out_tmp;
   
+
   nx1 = *nlon_in;
   ny1 = *nlat_in;
   nx2 = *nlon_out;
@@ -914,11 +921,27 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 
   nxgrid = 0;
 
-  int num_gangs=nx1*ny1;
-  int nsize=100;
-  int delta_gang;
-  double xgrid_area_tmp[num_gangs][nsize], xgrid_clon_tmp[num_gangs][nsize], xgrid_clat_tmp[num_gangs][nsize];
-  int i_in_tmp[num_gangs][nsize], j_in_tmp[num_gangs][nsize], i_out_tmp[num_gangs][nsize], j_out_tmp[num_gangs][nsize];
+  num_gangs=nx1*ny1;
+  nsize=100;
+
+  //allocate
+  xgrid_area_tmp = (double **)malloc(num_gangs*sizeof(double*));
+  xgrid_clon_tmp = (double **)malloc(num_gangs*sizeof(double*));
+  xgrid_clat_tmp = (double **)malloc(num_gangs*sizeof(double*));
+  i_in_tmp = (int **)malloc(num_gangs*sizeof(int*));
+  j_in_tmp = (int **)malloc(num_gangs*sizeof(int*));
+  i_out_tmp = (int **)malloc(num_gangs*sizeof(int*));
+  j_out_tmp = (int **)malloc(num_gangs*sizeof(int*));
+
+  for( int i=0 ; i<num_gangs ; i++ ){
+    xgrid_area_tmp[i] = (double *)malloc(nsize*sizeof(double));
+    xgrid_clon_tmp[i] = (double *)malloc(nsize*sizeof(double));
+    xgrid_clat_tmp[i] = (double *)malloc(nsize*sizeof(double));
+    i_in_tmp[i] = (int *)malloc(nsize*sizeof(int));
+    j_in_tmp[i] = (int *)malloc(nsize*sizeof(int));
+    i_out_tmp[i] = (int *)malloc(nsize*sizeof(int));
+    j_out_tmp[i] = (int *)malloc(nsize*sizeof(int));
+  }
 
   delta_gang=nx1*ny1/num_gangs;
   for(int igang=0 ; igang<num_gangs ; igang++){
@@ -926,11 +949,14 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
       i_in_tmp[igang][j]=-99;
     }
   }
+
+  //fprintf(stderr, 'herehere2\n');
+
 #pragma acc data							\
   copyin(lon_out[0:(nx2+1)*(ny2+1)], lat_out[0:(nx2+1)*(ny2+1)], mask_in[0:nx1*ny1], \
 	 area_in[0:nx1*ny1], area_out[0:nx2*ny2],			\
 	 lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)],		\
-	 nx1, ny1, nx2, ny2, nx1p, nx2p, delta_gang, nsize)		\
+	 nx1, ny1, nx2, ny2, nx1p, nx2p, delta_gang, nsize, num_gangs)	\
   copy( xgrid_area_tmp[0:num_gangs][0:nsize], xgrid_clon_tmp[0:num_gangs][0:nsize], \
 	xgrid_clat_tmp[0:num_gangs][0:nsize], i_in_tmp[0:num_gangs][0:nsize], \
 	j_in_tmp[0:num_gangs][0:nsize], i_out_tmp[0:num_gangs][0:nsize], \
@@ -939,6 +965,7 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 {
 #pragma acc parallel num_gangs(num_gangs)
 #pragma acc loop independent gang reduction(+:nxgrid)
+
   for (int igang=0; igang<num_gangs ; igang++) {
     int start_here_gang, end_here_gang;
     int nxgrid_gang=0;
@@ -968,18 +995,19 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 #pragma acc loop seq
 	 for(ij2=0; ij2<nx2*ny2; ij2++) {
 	   int n_out, i2, j2, n2_in, l;
+	   int n00, n01, n02, n03;
 	   double xarea, dx;
 	   double lon_out_min, lon_out_max, lat_out_min, lat_out_max, lon_out_avg;
 	   double x2_in[MAX_V], y2_in[MAX_V],  x_out[MV], y_out[MV];;
 	   
 	   i2 = ij2%nx2;
 	   j2 = ij2/nx2;	   
-	   n0 = j2*nx2p+i2; n1 = j2*nx2p+i2+1;
-	   n2 = (j2+1)*nx2p+i2+1; n3 = (j2+1)*nx2p+i2;
-	   x2_in[0] = lon_out[n0]; y2_in[0] = lat_out[n0];
-	   x2_in[1] = lon_out[n1]; y2_in[1] = lat_out[n1];
-	   x2_in[2] = lon_out[n2]; y2_in[2] = lat_out[n2];
-	   x2_in[3] = lon_out[n3]; y2_in[3] = lat_out[n3];
+	   n00 = j2*nx2p+i2; n01 = j2*nx2p+i2+1;
+	   n02 = (j2+1)*nx2p+i2+1; n03 = (j2+1)*nx2p+i2;
+	   x2_in[0] = lon_out[n00]; y2_in[0] = lat_out[n00];
+	   x2_in[1] = lon_out[n01]; y2_in[1] = lat_out[n01];
+	   x2_in[2] = lon_out[n02]; y2_in[2] = lat_out[n02];
+	   x2_in[3] = lon_out[n03]; y2_in[3] = lat_out[n03];
 	   
 	   lat_out_min = minval_double(4, y2_in);
 	   lat_out_max = maxval_double(4, y2_in);
@@ -1023,11 +1051,9 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	       j_out_tmp[igang][nxgrid_gang]      = j2;
 	       nxgrid_gang++;	    
 	       nxgrid++;
-	       if( nxgrid_gang>nsize) printf("HEREHEREHERE %d %d\n", nxgrid_gang, nsize);
 	     }//if
 	   }//if
 	 }//ij2
-	 //printf("%d %d\n", igang, nxgrid_gang);
        }//if
      } //ij1
    } //igang
