@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
   
   int errflg = (argc == 1);
   int fid;
-  
+ 
   static struct option long_options[] = {
     {"input_mosaic",     required_argument, NULL, 'a'},
     {"output_mosaic",    required_argument, NULL, 'b'},
