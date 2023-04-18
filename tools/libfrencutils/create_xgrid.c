@@ -1148,7 +1148,7 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	double x1_in[MV], y1_in[MV];
 
 	double area_in;	
-	int icount=0, counted=0;
+	int counted=0;
 	
 	counts_per_ij[ij1]=0;
 	
@@ -1213,16 +1213,15 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	    min_area = min(area_in, area_out[j2*nx2+i2]);
 	    if( xarea/min_area > AREA_RATIO_THRESH ) {
 	      nxgrid++;	    
-	      icount++;
+	      counts_per_ij[ij1]++;
+	      ij_end[ij1]=ij;
 	      if( counted==0 ){
 	      	ij_start[ij1]=ij;
 	      	counted=100;
 	      }//if
-	      ij_end[ij1]=ij;
 	    }//if
 	  }//if
 	} //ij2
-	counts_per_ij[ij1]=icount;
       }//if
   }// i1j1
   }//data
