@@ -1052,6 +1052,52 @@ int get_nxgrid(const int *nlon_in, const int *nlat_in, const int *nlon_out, cons
 };/* get_nxgrid */
 
 
+void get_list_out( const int nx2, const int ny2, const double *lon_out, const double *lat_out, 
+		   double *lon_out_min_list, double *lon_out_max_list, 
+		   double *lat_out_min_list, double *lat_out_max_list, 
+		   double *lon_out_avg, double *lon_out_list, double *lat_out_list, double *area_out, 
+		   int *n2_list)
+{
+
+  int MAX_VV=8;
+
+#pragma acc data present( lon_out_list[0:MAX_VV*nx2*ny2], lat_out_list[0:MAX_VV*nx2*ny2], \
+			  lat_out_min_list[0:nx2*ny2], lat_out_max_list[0:nx2*ny2], \
+			  lon_out_min_list[0:nx2*ny2], lon_out_max_list[0:nx2*ny2], \
+			  lon_out_avg[0:nx2*ny2], n2_list[0:nx2*ny2],area_out[0:nx2*ny2], \
+			  lon_out[0:(nx2+1)*(ny2+1)],lat_out[0:(nx2+1)*(ny2+1)]) \
+  copyin(nx2, ny2, MAX_VV)
+#pragma acc kernels 
+#pragma acc loop independent
+  for(int ij=0; ij<nx2*ny2; ij++){
+    int i2, j2, nn, n0, n1, n2, n3, n2_in, l;
+    double x2_in[50], y2_in[50];
+
+    i2 = ij%nx2;
+    j2 = ij/nx2;
+    nn = j2*nx2+i2;
+    n0 = j2*(nx2+1)+i2; n1 = j2*(nx2+1)+i2+1;
+    n2 = (j2+1)*(nx2+1)+i2+1; n3 = (j2+1)*(nx2+1)+i2;
+    x2_in[0] = lon_out[n0]; y2_in[0] = lat_out[n0];
+    x2_in[1] = lon_out[n1]; y2_in[1] = lat_out[n1];
+    x2_in[2] = lon_out[n2]; y2_in[2] = lat_out[n2];
+    x2_in[3] = lon_out[n3]; y2_in[3] = lat_out[n3];
+    lat_out_min_list[nn] = minval_double(4, y2_in);
+    lat_out_max_list[nn] = maxval_double(4, y2_in);
+    n2_in = fix_lon(x2_in, y2_in, 4, M_PI); //if(n2_in > MAX_V) error_handler("create_xgrid.c: n2_in is greater than MAX_V");                                                                                                                             
+    lon_out_min_list[nn] = minval_double(n2_in, x2_in);
+    lon_out_max_list[nn] = maxval_double(n2_in, x2_in);
+    lon_out_avg[nn] = avgval_double(n2_in, x2_in);
+    n2_list[nn] = n2_in;
+    area_out[ij]=poly_area(x2_in, y2_in, n2_in);
+#pragma acc loop independent
+    for(l=0; l<n2_in; l++) {
+      lon_out_list[nn*MAX_VV+l] = x2_in[l];
+      lat_out_list[nn*MAX_VV+l] = y2_in[l];
+    }
+  }
+}
+
 int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out,
 				  const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
 				  const double *mask_in, const double *lon_out_list, const double *lat_out_list, 
@@ -1087,7 +1133,7 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
   present( lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)] )
 {
 #pragma acc kernels
-#pragma acc loop independent reduction(+:nxgrid)
+#pragma acc loop independent reduction(+:nxgrid) 
   for (int ij1=0 ; ij1<nx1*ny1 ; ij1++ ) {
     if( mask_in[ij1] > MASK_THRESH ) {
 	int n0, n1, n2, n3, n1_in;
@@ -1117,7 +1163,7 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 
 	area_in= poly_area(x1_in, y1_in, n1_in);
 	
-#pragma acc loop independent reduction(+:nxgrid)
+#pragma acc loop independent reduction(+:nxgrid) 
 	for(ij=0; ij<nx2*ny2; ij++) {
 	  int n_out, i2, j2, n2_in, l;
 	  double xarea, dx, lon_out_min, lon_out_max;
@@ -1216,7 +1262,7 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
   present( lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)])
 {
 #pragma acc kernels
-#pragma acc loop independent reduction(+:nxgrid) 
+#pragma acc loop independent
   for(int ij1=0 ; ij1<nx1*ny1 ; ij1++){
     if( mask_in[ij1] > MASK_THRESH ) {
       int n0, n1, n2, n3, n1_in, sum;
@@ -1249,7 +1295,7 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	for(int l=0;l<ij1;l++) sum+=counts_per_ij[l];
       }	
 
-#pragma acc loop independent reduction(+:nxgrid) 
+#pragma acc loop independent
       for(ij=ij_start[ij1]; ij<=ij_end[ij1]; ij++) {
 	int n_out, i2, j2, n2_in, l;
 	double xarea, dx, lon_out_min, lon_out_max;
@@ -1299,7 +1345,6 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	    j_in[sum+icount]       = j1;
 	    i_out[sum+icount]      = i2;
 	    j_out[sum+icount]      = j2;
-	    nxgrid++;	    
 	    icount++;
 	  }//if
 	}//if
@@ -1309,7 +1354,8 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 } //data
 
 
-  return nxgrid;
+ nxgrid=*nxgrid_in;
+ return nxgrid;
 
 };/* get_xgrid_2Dx2D_order2 */
 #else
@@ -3594,3 +3640,4 @@ int main(int argc, char* argv[])
 
 
 #endif
+

@@ -68,6 +68,12 @@ int get_nxgrid(const int *nlon_in, const int *nlat_in, const int *nlon_out, cons
 	       const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
 	       const double *mask_in);
 
+void get_list_out( const int nx2, const int ny2, const double *lon_out, const double *lat_out,
+                   double *lon_out_min_list, double *lon_out_max_list,
+                   double *lat_out_min_list, double *lat_out_max_list,
+                   double *lon_out_avg, double *lon_out_list, double *lat_out_list, double *area_out,
+                   int *n2_list);
+
 int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out,
 				  const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
 				  const double *mask_in, const double *lon_out_list, const double *lat_out_list,
