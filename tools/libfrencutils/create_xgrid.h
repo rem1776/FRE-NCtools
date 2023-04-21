@@ -64,15 +64,27 @@ int create_xgrid_2dx2d_order1(const int *nlon_in, const int *nlat_in, const int 
 			      const double *mask_in, int *i_in, int *j_in, int *i_out,
 			      int *j_out, double *xgrid_area);
 
+int get_nxgrid(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out,
+	       const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
+	       const double *mask_in);
+
 int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out,
 				  const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
-				  const double *mask_in, int *counts_per_ij, int *ij_start);
+				  const double *mask_in, const double *lon_out_list, const double *lat_out_list,
+				  const double *lat_out_min_list, const double *lat_out_max_list,
+				  const double *lon_out_min_list, const double* lon_out_max_list,
+				  const double *lon_out_avg, const int *n2_list, const double *area_out,
+				  int *counts_per_ij, int *ij_start, int *ij_end);
 
 int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out, const int *nxgrid_in,
 			      const double *lon_in, const double *lat_in, const double *lon_out, const double *lat_out,
-			      const double *mask_in, const int *counts_per_ij, const int *ij_start, int *i_in, int *j_in, int *i_out, int *j_out,
-
+			      const double *mask_in, const double *lon_out_list, const double *lat_out_list,
+                              const double *lat_out_min_list, const double *lat_out_max_list,
+                              const double *lon_out_min_list, const double* lon_out_max_list,
+                              const double *lon_out_avg, const int *n2_list, const double *area_out,
+			      const int *counts_per_ij, const int *ij_start, const int *ij_end, int *i_in, int *j_in, int *i_out, int *j_out,
 			      double *xgrid_area, double *xgrid_clon, double *xgrid_clat);
+
 int clip_2dx2d_great_circle(const double x1_in[], const double y1_in[], const double z1_in[], int n1_in,
 			    const double x2_in[], const double y2_in[], const double z2_in [], int n2_in,
 			    double x_out[], double y_out[], double z_out[]);
