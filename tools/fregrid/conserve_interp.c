@@ -176,7 +176,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 			      lon_out_min_list[0:nx2*ny2], lon_out_max_list[0:nx2*ny2],	\
 			      lon_out_avg[0:nx2*ny2], n2_list[0:nx2*ny2],area_out2[0:nx2*ny2]) 
 
-      get_list_out(nx_out, ny_out, grid_out[n].lonc, grid_out[n].latc,
+      get_list_inout(nx_out, ny_out, grid_out[n].lonc, grid_out[n].latc,
                    lon_out_min_list, lon_out_max_list,
 		   lat_out_min_list, lat_out_max_list,
                    lon_out_avg, lon_out_list, lat_out_list, area_out2, n2_list);

@@ -1106,10 +1106,6 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 				  const double *lat_out_min_list, const double *lat_out_max_list,
 				  const double *lon_out_min_list, const double* lon_out_max_list,
 				  const double *lon_out_avg, const int *n2_list, const double *area_out,				  
-				  const double *lon_in_list, const double *lat_in_list, 
-				  const double *lat_in_min_list, const double *lat_in_max_list,
-				  const double *lon_in_min_list, const double* lon_in_max_list,
-				  const double *lon_in_avg, const int *n1_list, const double *area_in,				  
 				  int *counts_per_ij, int *ij_start, int *ij_end)
 {
 
@@ -1132,23 +1128,19 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	 lat_out_min_list[0:nx2*ny2], lat_out_max_list[0:nx2*ny2],	\
 	 lon_out_min_list[0:nx2*ny2], lon_out_max_list[0:nx2*ny2],	\
 	 lon_out_avg[0:nx2*ny2], n2_list[0:nx2*ny2],area_out[0:nx2*ny2]) \
-  present(lon_in_list[0:MAX_V*nx1*ny1], lat_in_list[0:MAX_V*nx1*ny1],	\
-	 lat_in_min_list[0:nx1*ny1], lat_in_max_list[0:nx1*ny1],	\
-	 lon_in_min_list[0:nx1*ny1], lon_in_max_list[0:nx1*ny1],	\
-	 lon_in_avg[0:nx1*ny1], n1_list[0:nx1*ny1],area_in[0:nx1*ny1]) \
   present( counts_per_ij[0:nx1*ny1], ij_start[0:nx1*ny1], ij_end[0:nx1*ny1],mask_in[0:nx1*ny1] ) \
   present( lon_out[0:(nx2+1)*(ny2+1)], lat_out[0:(nx2+1)*(ny2+1)] )	\
   present( lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)] )
 {
 #pragma acc parallel
-#pragma acc loop independent reduction(+:nxgrid)
+#pragma acc loop independent reduction(+:nxgrid) 
   for(int ij1=0; ij1<nx1*ny1 ; ij1++) {
     int icount=0;
     int ij_max=0, ij_min=nx2*ny2+1;
     if( mask_in[ij1] > MASK_THRESH ) {
       int n0, n1, n2, n3, n1_in;
-	double lat_in_min,lat_in_max,lon_in_min,lon_in_max,lon_in_avg1;
-	double x1_in[MV], y1_in[MV];
+      double lat_in_min,lat_in_max,lon_in_min,lon_in_max,lon_in_avg, area_in;
+      double x1_in[MV], y1_in[MV];
 
 	double area_in1;	
 	
@@ -1157,20 +1149,19 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	i1=ij1%nx1;
 	j1=ij1/nx1;
 
-	lat_in_min = lat_in_min_list[ij1];
-	lat_in_max = lat_in_max_list[ij1];
-	lon_in_min = lon_in_min_list[ij1];
-	lon_in_max = lon_in_max_list[ij1];
-	lon_in_avg1 = lon_in_avg[ij1];
-	area_in1= area_in[ij1];
-	n1_in=n1_list[ij1];
-
-#pragma acc loop seq
-	for(int l=0; l<n1_in; l++) {
-	  x1_in[l] = lon_in_list[ij1*MAX_V+l];
-	  y1_in[l] = lat_in_list[ij1*MAX_V+l];
-	}
-	
+	n0 = j1*nx1p+i1;       n1 = j1*nx1p+i1+1;
+	n2 = (j1+1)*nx1p+i1+1; n3 = (j1+1)*nx1p+i1;
+	x1_in[0] = lon_in[n0]; y1_in[0] = lat_in[n0];
+	x1_in[1] = lon_in[n1]; y1_in[1] = lat_in[n1];
+	x1_in[2] = lon_in[n2]; y1_in[2] = lat_in[n2];
+	x1_in[3] = lon_in[n3]; y1_in[3] = lat_in[n3];
+	lat_in_min = minval_double(4, y1_in);
+	lat_in_max = maxval_double(4, y1_in);
+	n1_in = fix_lon(x1_in, y1_in, 4, M_PI);
+	lon_in_min = minval_double(n1_in, x1_in);
+	lon_in_max = maxval_double(n1_in, x1_in);
+	lon_in_avg = avgval_double(n1_in, x1_in);
+	area_in=poly_area(x1_in, y1_in, n1_in);
 	
 #pragma acc loop independent reduction(+:nxgrid) reduction(+:icount) reduction(max:ij_max) reduction(min:ij_min)
 	for(ij=0; ij<nx2*ny2; ij++) {
@@ -1192,7 +1183,7 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	  }
 	  lon_out_min = lon_out_min_list[ij];
 	  lon_out_max = lon_out_max_list[ij];
-	  dx = lon_out_avg[ij] - lon_in_avg1;
+	  dx = lon_out_avg[ij] - lon_in_avg;
 	  if(dx < -M_PI ) {
 	    lon_out_min += TPI;
 	    lon_out_max += TPI;
@@ -1214,7 +1205,7 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 	  if (  (n_out = clip_2dx2d( x1_in, y1_in, n1_in, x2_in, y2_in, n2_in, x_out, y_out )) > 0) {
 	    double min_area;
 	    xarea = poly_area (x_out, y_out, n_out ) * mask_in[j1*nx1+i1];
-	    min_area = min(area_in1, area_out[j2*nx2+i2]);
+	    min_area = min(area_in, area_out[j2*nx2+i2]);
 	    if( xarea/min_area > AREA_RATIO_THRESH ) {
 	      nxgrid++;	    
 	      icount++;
@@ -1244,10 +1235,6 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 			      const double *lat_out_min_list, const double *lat_out_max_list,
 			      const double *lon_out_min_list, const double* lon_out_max_list,
 			      const double *lon_out_avg, const int *n2_list, const double *area_out, 
-			      const double *lon_in_list, const double *lat_in_list, 
-			      const double *lat_in_min_list, const double *lat_in_max_list,
-			      const double *lon_in_min_list, const double* lon_in_max_list,
-			      const double *lon_in_avg, const int *n1_list, const double *area_in, 
 			      const int *counts_per_ij, const int *ij_start, const int *ij_end, int *i_in, int *j_in, int *i_out, int *j_out,
 			      double *xgrid_area, double *xgrid_clon, double *xgrid_clat)
 {
@@ -1271,23 +1258,19 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	  lat_out_min_list[0:nx2*ny2], lat_out_max_list[0:nx2*ny2],	\
 	  lon_out_min_list[0:nx2*ny2], lon_out_max_list[0:nx2*ny2],	\
 	  lon_out_avg[0:nx2*ny2], n2_list[0:nx2*ny2],area_out[0:nx2*ny2]) \
-  present(lon_in_list[0:MAX_V*nx1*ny1], lat_in_list[0:MAX_V*nx1*ny1],	\
-	  lat_in_min_list[0:nx1*ny1], lat_in_max_list[0:nx1*ny1],	\
-	  lon_in_min_list[0:nx1*ny1], lon_in_max_list[0:nx1*ny1],	\
-	  lon_in_avg[0:nx1*ny1], n1_list[0:nx1*ny1],area_in[0:nx1*ny1]) \    
   present(xgrid_area[0:nxgrid_inn], xgrid_clon[0:nxgrid_inn], xgrid_clat[0:nxgrid_inn], \
 	  i_in[0:nxgrid_inn], j_in[0:nxgrid_inn], i_out[0:nxgrid_inn],j_out[0:nxgrid_inn]) \
-    present( counts_per_ij[0:nx1*ny1], ij_start[0:nx1*ny1], ij_end[0:nx1*ny1], mask_in[0:nx1*ny1] ) \
-    present( lon_out[0:(nx2+1)*(ny2+1)], lat_out[0:(nx2+1)*(ny2+1)])	\
-    present( lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)])	\
-    copy(nxgrid)
+  present( counts_per_ij[0:nx1*ny1], ij_start[0:nx1*ny1], ij_end[0:nx1*ny1], mask_in[0:nx1*ny1] ) \
+  present( lon_out[0:(nx2+1)*(ny2+1)], lat_out[0:(nx2+1)*(ny2+1)])	\
+  present( lon_in[0:(nx1+1)*(ny1+1)], lat_in[0:(nx1+1)*(ny1+1)])	\
+  copy(nxgrid)
 {
 #pragma acc kernels
 #pragma acc loop independent reduction(+:nxgrid)
   for(int ij1=0 ; ij1<nx1*ny1 ; ij1++){
     if( mask_in[ij1] > MASK_THRESH ) {
       int n0, n1, n2, n3, n1_in, sum;
-      double lat_in_min,lat_in_max,lon_in_min,lon_in_max,lon_in_avg1;
+      double lat_in_min,lat_in_max,lon_in_min,lon_in_max,lon_in_avg, area_in;
       double x1_in[MV], y1_in[MV];     
 
       int icount=0, start_here;
@@ -1296,19 +1279,19 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
       i1 = ij1%nx1;
       j1 = ij1/nx1;
 
-      lat_in_min = lat_in_min_list[ij1];
-      lat_in_max = lat_in_max_list[ij1];
-      lon_in_min = lon_in_min_list[ij1];
-      lon_in_max = lon_in_max_list[ij1];
-      lon_in_avg1 = lon_in_avg[ij1];
-      area_in1= area_in[ij1];
-      n1_in=n1_list[ij1];
-      
-#pragma acc loop seq
-      for(int l=0; l<n1_in; l++) {
-	x1_in[l] = lon_in_list[ij1*MAX_V+l];
-	y1_in[l] = lat_in_list[ij1*MAX_V+l];
-      }
+      n0 = j1*nx1p+i1;       n1 = j1*nx1p+i1+1;
+      n2 = (j1+1)*nx1p+i1+1; n3 = (j1+1)*nx1p+i1;
+      x1_in[0] = lon_in[n0]; y1_in[0] = lat_in[n0];
+      x1_in[1] = lon_in[n1]; y1_in[1] = lat_in[n1];
+      x1_in[2] = lon_in[n2]; y1_in[2] = lat_in[n2];
+      x1_in[3] = lon_in[n3]; y1_in[3] = lat_in[n3];
+      lat_in_min = minval_double(4, y1_in);
+      lat_in_max = maxval_double(4, y1_in);
+      n1_in = fix_lon(x1_in, y1_in, 4, M_PI);
+      lon_in_min = minval_double(n1_in, x1_in);
+      lon_in_max = maxval_double(n1_in, x1_in);
+      lon_in_avg = avgval_double(n1_in, x1_in);
+      area_in=poly_area(x1_in, y1_in, n1_in);
       
       sum=0;
       if( ij1>0 ) {
@@ -1336,7 +1319,7 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	}
 	lon_out_min = lon_out_min_list[ij];
 	lon_out_max = lon_out_max_list[ij];
-	dx = lon_out_avg[ij] - lon_in_avg1;
+	dx = lon_out_avg[ij] - lon_in_avg;
 	if(dx < -M_PI ) {
 	  lon_out_min += TPI;
 	  lon_out_max += TPI;
@@ -1358,10 +1341,10 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
 	if (  (n_out = clip_2dx2d( x1_in, y1_in, n1_in, x2_in, y2_in, n2_in, x_out, y_out )) > 0) {
 	  double min_area;
 	  xarea = poly_area (x_out, y_out, n_out ) * mask_in[j1*nx1+i1];
-	  min_area = min(area_in1, area_out[j2*nx2+i2]);
+	  min_area = min(area_in, area_out[j2*nx2+i2]);
 	  if( xarea/min_area > AREA_RATIO_THRESH ) {
 	    xgrid_area[sum+icount] = xarea;
-	    xgrid_clon[sum+icount] = poly_ctrlon(x_out, y_out, n_out, lon_in_avg1);
+	    xgrid_clon[sum+icount] = poly_ctrlon(x_out, y_out, n_out, lon_in_avg);
 	    xgrid_clat[sum+icount] = poly_ctrlat (x_out, y_out, n_out );
 	    i_in[sum+icount]       = i1;
 	    j_in[sum+icount]       = j1;

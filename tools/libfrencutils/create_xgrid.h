@@ -81,10 +81,6 @@ int pre_create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const 
 				  const double *lat_out_min_list, const double *lat_out_max_list,
 				  const double *lon_out_min_list, const double* lon_out_max_list,
 				  const double *lon_out_avg, const int *n2_list, const double *area_out,
-				  const double *lon_in_list, const double *lat_in_list,
-				  const double *lat_in_min_list, const double *lat_in_max_list,
-				  const double *lon_in_min_list, const double* lon_in_max_list,
-				  const double *lon_in_avg, const int *n1_list, const double *area_in,
 				  int *counts_per_ij, int *ij_start, int *ij_end);
 
 int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int *nlon_out, const int *nlat_out, const int *nxgrid_in,
@@ -94,10 +90,6 @@ int create_xgrid_2dx2d_order2(const int *nlon_in, const int *nlat_in, const int 
                               const double *lat_out_min_list, const double *lat_out_max_list,
                               const double *lon_out_min_list, const double* lon_out_max_list,
                               const double *lon_out_avg, const int *n2_list, const double *area_out,
-			      const double *lon_in_list, const double *lat_in_list,
-			      const double *lat_in_min_list, const double *lat_in_max_list,
-			      const double *lon_in_min_list, const double* lon_in_max_list,
-			      const double *lon_in_avg, const int *n1_list, const double *area_in,
 			      const int *counts_per_ij, const int *ij_start, const int *ij_end, int *i_in, int *j_in, int *i_out, int *j_out,
 			      double *xgrid_area, double *xgrid_clon, double *xgrid_clat);
 
