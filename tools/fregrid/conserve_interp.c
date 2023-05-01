@@ -245,6 +245,10 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	xgrid_clon = (double *)malloc(nxgrid_in  * sizeof(double));
 	xgrid_clat = (double *)malloc(nxgrid_in  * sizeof(double));;
 
+#pragma acc enter data  create(i_in[0:nxgrid_in], j_in[0:nxgrid_in], i_out[0:nxgrid_in], j_out[0:nxgrid_in],\
+			      xgrid_area[0:nxgrid_in], xgrid_clon[0:nxgrid_in], xgrid_clat[0:nxgrid_in])
+	
+
 	time_end = clock();
 	time_nxgrid = (time_end - time_start)/CLOCKS_PER_SEC;
 	printf("time=%f ", time_nxgrid);
@@ -256,6 +260,11 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 					   lon_out_min_list, lon_out_max_list, lon_out_avg, n2_list, area_out2, 
 					   counts_per_ij, ij_start, ij_end, i_in, j_in, i_out, j_out, 
 					   xgrid_area, xgrid_clon, xgrid_clat);
+
+#pragma acc exit data copyout(i_in[0:nxgrid_in], j_in[0:nxgrid_in], i_out[0:nxgrid_in], j_out[0:nxgrid_in], \
+			       xgrid_area[0:nxgrid_in], xgrid_clon[0:nxgrid_in], xgrid_clat[0:nxgrid_in])
+	
+
 
 	time_end = clock();
 	time_nxgrid = (time_end - time_start)/CLOCKS_PER_SEC;
