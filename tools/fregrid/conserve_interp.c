@@ -257,7 +257,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 	printf("time=%f ", time_nxgrid);
 	
 #ifdef _OPENACC
-	nxgrid = create_xgrid_2dx2d_order2(&nx_in, &ny_now, &nx_out, &ny_out, &nxgrid_in, 
+	nxgrid = create_xgrid_2dx2d_order2_gpu(&nx_in, &ny_now, &nx_out, &ny_out, &nxgrid_in, 
 					   grid_in[m].lonc+jstart*(nx_in+1),
 					   grid_in[m].latc+jstart*(nx_in+1),  grid_out[n].lonc,  grid_out[n].latc,
 					   mask, lon_out_list, lat_out_list, lat_out_min_list, lat_out_max_list,
@@ -265,7 +265,7 @@ void setup_conserve_interp(int ntiles_in, const Grid_config *grid_in, int ntiles
 					   counts_per_ij, ij_start, ij_end, i_in, j_in, i_out, j_out, 
 					   xgrid_area, xgrid_clon, xgrid_clat);
 #else
-        nxgrid = create_xgrid_2dx2d_order2(&nx_in, &ny_now, &nx_out, &ny_out, grid_in[m].lonc+jstart*(nx_in+1),
+        nxgrid = create_xgrid_2dx2d_order2_cpu(&nx_in, &ny_now, &nx_out, &ny_out, grid_in[m].lonc+jstart*(nx_in+1),
 					       grid_in[m].latc+jstart*(nx_in+1),  grid_out[n].lonc,  grid_out[n].latc,
 					       mask, i_in, j_in, i_out, j_out, xgrid_area, xgrid_clon, xgrid_clat);
 #endif
