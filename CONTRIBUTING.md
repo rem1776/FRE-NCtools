@@ -24,9 +24,6 @@ propose changes to this document in a pull request.
   * [Pull Requests](#pull-requests)
   * [Tests](#tests)
 * [Styleguides](#styleguides)
-* [Maintainer How-To](#maintainer-how-to)
-  * [Migrate GitHub Pull Request](#migrate-github-pull-request)
-  * [GitLab Push Mirror](#gitlab-push-mirror)
 
 ## Code of Conduct
 
@@ -166,33 +163,3 @@ Keep the following in mind when contributing to FRE-NCtools
 ### Python Styleguide
 
 * Follow [PEP 8](https://www.python.org/dev/peps/pep-0008/) when possible
-
-## Maintainer How-To
-
-The following are *How To* guides to help maintain the FRE-NCtools repository.
-
-### Migrate GitHub Pull Request
-
-When a pull request is submitted on GitHub and the GitHub status checks are
-passing, the maintainer will need to migrate the pull request to the internal
-[GFDL GitLab FRE-NCtools](https://gitlab.gfdl.noaa.gov/fre/fre-nctools)
-repository.  The following steps can be taken to migrate the pull request.
-
-1. <details><summary>Review the GitHub code to ensure no malicious code or scripts were introduced</summary>This is required as migrating the pull request to GitLab will automatically run the GitLab tests.</details>
-1. <details><summary>Clone the GitLab repository</summary><code>git clone git@gitlab.gfdl.noaa.gov/fre/fre-nctools.git</code></details>
-1. <details><summary>Add the GitHub repository as a remote</summary><code>git remote add github https://github.com/NOAA-GFDL/FRE-NCtools.git</code></details>
-1. Find the ID number of the GitHub pull request.  This is the sequence of digits right after the pull request's title.
-1. <details><summary>Fetch the reference pull request based on its ID number, and place it in a new branch</summary><code>git fetch github pull/<ID>/head:<BRANCH_NAME></code>  Replace <code>&lt;ID&gt;</code> with the pull request ID, and <code>&lt;BRANCH_NAME&gt;</code> with the new branch name.</details>
-1. <details><summary>Switch to the new branch</summary><code>git checkout &lt;BRANCH_NAME&gt;</code></details>
-1. <details><summary>Push the new branch to GitLab</summary><code>git push origin <BRANCH_NAME></code></details>
-
-Once the GitHub pull request is migrated, open a GitLab merge request, and assign
-a reviewer to review the code, and perform the merge once the GitLab.
-
-### GitLab Push Mirror
-
-The internal [GFDL GitLab FRE-NCtools](https://gitlab.gfdl.noaa.gov/fre/fre-nctools)
-repository contains the *official* development trunk for FRE-NCtools.  To help
-ensure the GitHub mirror remains up-to-date with development and releases, the
-GitLab protected branches are automatically mirrored to GitHub using GitLab's
-push [repository mirroring](https://docs.gitlab.com/ce/workflow/repository_mirroring.html#setting-up-a-push-mirror-from-gitlab-to-github-core).
