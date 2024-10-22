@@ -48,8 +48,8 @@ gx_cv_openacc_flags=unknown
 gx_openacc_flags_CFLAGS_save=$CFLAGS
 
 dnl check for base openacc flag
-for ac_flag in '-acc' \
-               '-fopenacc'; do
+for ac_flag in -acc -fopenacc; do
+  CFLAGS="$gx_openacc_flags_CFLAGS_save $ac_flag"
   AC_LINK_IFELSE([AC_LANG_SOURCE(
           extern int acc_get_device_type();
           int main(int argc, char** argv){

@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <openacc.h>
 #include "general_utils_acc.h"
 #include "globals_acc.h"
 
@@ -292,6 +293,7 @@ void xyz2latlon_acc( int np, const double *x, const double *y, const double *z, 
   So, I2=\integral dx sin(arctan(tan(lat0)*cos(x-lon0)))  can be shown to give an accurate estimate of grid
   cell areas surrounding the pole without a bump.
    ----------------------------------------------------------------------------*/
+#pragma acc routine
 double poly_area_main_acc(const double x[], const double y[], int n) {
   double area = 0.0;
   int i;
@@ -389,7 +391,7 @@ double poly_area_acc(const double xo[], const double yo[], int n) {
     }
   }
 }
-
+#pragma acc routine
 int delete_vtx_acc(double x[], double y[], int n, int n_del)
 {
   for (;n_del<n-1;n_del++) {
@@ -399,7 +401,7 @@ int delete_vtx_acc(double x[], double y[], int n, int n_del)
 
   return (n-1);
 } /* delete_vtx */
-
+#pragma acc routine
 int insert_vtx_acc(double x[], double y[], int n, int n_ins, double lon_in, double lat_in)
 {
   int i;
@@ -1310,6 +1312,7 @@ void set_the_rotation_matrix_acc() {
   double m02 = is2;
   double m11 = 1.0/2;
   double m12 = 0.5;
+  //size_t update_size;
 
   double m[3][3] = { {m00, m01, m02}, {m02, m11, m12},{m01, m12, m11} };
 
@@ -1318,7 +1321,15 @@ void set_the_rotation_matrix_acc() {
       the_rotation_matrix_acc[i][j] = m[i][j];
     }
   }
-#pragma acc data update device(the_rotation_matrix_acc[:3][:3])
+
+// fails to compile
+//#pragma acc data update device(the_rotation_matrix_acc[:3][:3])
+// compiles but fails to link
+//#pragma acc update device(the_rotation_matrix_acc[:3][:3])
+  // also fails to link
+  // update_size = sizeof(the_rotation_matrix_acc[0][0]) * 9;
+  //acc_update_device(the_rotation_matrix_acc, update_size);
+
 }
 
 /* Rotate point given the passed in rotation matrix  */

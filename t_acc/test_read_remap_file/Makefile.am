@@ -22,7 +22,8 @@ check_PROGRAMS = test_read_remap_file
 AM_CFLAGS = $(NETCDF_CFLAGS) \
             -I$(top_srcdir)/tools/libfrencutils  \
             -I$(top_srcdir)/tools/libfrencutils_acc \
-            -I$(top_srcdir)/tools/fregrid_acc -acc
+            -I$(top_srcdir)/tools/fregrid_acc \
+            $(OPENACC_CFLAGS)
 
 LDADD = $(NETCDF_LDFLAGS) $(NETCDF_LIBS) $(RPATH_FLAGS) \
         $(top_builddir)/tools/fregrid_acc/conserve_interp_acc.o \

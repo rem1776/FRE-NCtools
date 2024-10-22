@@ -326,10 +326,10 @@ void check_answers_on_host( Answers *answers, Interp_config_acc *interp_acc, int
 
   // copyout answers
   for(int n=0 ; n<OUTPUT_GRID_NTILES; n++) {
-    acc_update_host( &interp_acc[n].nxcells, sizeof(size_t) );
+    acc_update_self( &interp_acc[n].nxcells, sizeof(size_t) );
     for(int m=0 ; m<INPUT_GRID_NTILES ; m++) {
       int inxcells = answers[n].nxcells[m];
-      acc_update_host( &interp_acc[n].input_tile[m].nxcells, sizeof(int));
+      acc_update_self( &interp_acc[n].input_tile[m].nxcells, sizeof(int));
       acc_copyout( interp_acc[n].input_tile[m].input_parent_cell_index,  inxcells*sizeof(int));
       acc_copyout( interp_acc[n].input_tile[m].output_parent_cell_index, inxcells*sizeof(int));
       acc_copyout( interp_acc[n].input_tile[m].xcell_area,  inxcells*sizeof(double));

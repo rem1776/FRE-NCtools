@@ -26,6 +26,13 @@
 #include "create_xgrid_utils_acc.h"
 #include "globals_acc.h"
 
+// TODO
+// this should really be added to the header instead
+void copy_data_to_interp_on_device_acc(const int nxcells, const int input_ncells, const int upbound_nxcells,
+                                      int *xcells_per_ij1, double *xcell_dclon, double *xcell_dclat,
+                                      int *approx_xcells_per_ij1, int *parent_input_index, int *parent_output_index,
+                                      double *xcell_areas, Interp_per_input_tile *interp_for_input_tile);
+
 /*******************************************************************************
 void get_upbound_nxcells_2dx2d_acc
 This function computes the upperbound to nxgrid.  This upper bound will be used

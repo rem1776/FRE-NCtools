@@ -22,7 +22,8 @@ check_PROGRAMS = test_get_interp_order1
 AM_CFLAGS =  $(NETCDF_CFLAGS) \
             -I$(top_srcdir)/tools/fregrid_acc \
             -I$(top_srcdir)/tools/libfrencutils \
-            -I$(top_srcdir)/tools/libfrencutils_acc -acc
+            -I$(top_srcdir)/tools/libfrencutils_acc \
+            $(OPENACC_CFLAGS)
 
 LDADD = $(NETCDF_LDFLAGS) $(NETCDF_LIBS) $(RPATH_FLAGS) \
         $(top_builddir)/tools/fregrid_acc/interp_utils_acc.o \
