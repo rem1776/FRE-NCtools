@@ -1,0 +1,30 @@
+name: Create Release files and tag
+on: push
+  #push:
+  #  tags:
+  #    - 20*.* # TODO update this in 75 years
+  #    - 20*.*.*
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/noaa-gfdl/fre-nctools-ci-rocky-gnu:14.2.0_v2
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Configure
+      run: |
+        mkdir build && cd build
+        autoreconf -i ../configure.ac
+        ../configure
+    - name: Build and create distribution
+      run: |
+        make distcheck
+        make dist
+    - name: Upload to Release Action
+      uses: Shopify/upload-to-release@v2.0.0
+      with:
+        name: test-upload
+        path: build/fre-nctools-2024.05.tar.gz
