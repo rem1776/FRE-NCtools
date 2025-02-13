@@ -1,11 +1,12 @@
-name: Create Release files and tag
-on: push
-  #push:
-  #  tags:
-  #    - 20*.* # TODO update this in 75 years
-  #    - 20*.*.*
+name: Create Release draft and upload dist
+on:
+  push:
+    tags:
+      - 20*.* # TODO update in 75 years
+      - 20*.*.*
+
 jobs:
-  create-release:
+  create-release-dist:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/noaa-gfdl/fre-nctools-ci-rocky-gnu:14.2.0_v2
@@ -21,10 +22,13 @@ jobs:
         ../configure
     - name: Build and create distribution
       run: |
+        cd build
         make distcheck
         make dist
-    - name: Upload to Release Action
-      uses: Shopify/upload-to-release@v2.0.0
+    - name: Create release draft and upload dist files
+      uses: softprops/action-gh-release@v2
       with:
-        name: test-upload
-        path: build/fre-nctools-2024.05.tar.gz
+        files: |
+          build/fre-nctools-*.*.tar.gz
+          build/fre-nctools-*.*.*.tar.gz
+        draft: True
