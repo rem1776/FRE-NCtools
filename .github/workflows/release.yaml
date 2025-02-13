@@ -1,0 +1,34 @@
+name: Create Release draft and upload dist
+on:
+  push:
+    tags:
+      - 20*.* # TODO update in 75 years
+      - 20*.*.*
+
+jobs:
+  create-release-dist:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/noaa-gfdl/fre-nctools-ci-rocky-gnu:14.2.0_v2
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - name: Configure
+      run: |
+        mkdir build && cd build
+        autoreconf -i ../configure.ac
+        ../configure
+    - name: Build and create distribution
+      run: |
+        cd build
+        make distcheck
+        make dist
+    - name: Create release draft and upload dist files
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          build/fre-nctools-*.*.tar.gz
+          build/fre-nctools-*.*.*.tar.gz
+        draft: True
