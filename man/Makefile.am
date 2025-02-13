@@ -44,6 +44,7 @@ EXTRA_DIST = \
   river_regrid.txt \
   scatter-ncc.txt \
   split_ncvars.pl.txt \
+  split_ncvars.pl.1 \
   timavg.txt \
   timavg.csh.1 \
   time_average.txt \
