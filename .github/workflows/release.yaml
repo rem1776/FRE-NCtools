@@ -9,7 +9,7 @@ jobs:
   create-release-dist:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/noaa-gfdl/fre-nctools-ci-rocky-gnu:14.2.0_v2
+      image: ghcr.io/rem1776/fre-nctools:dist-test
     steps:
     - name: Checkout
       uses: actions/checkout@v4
