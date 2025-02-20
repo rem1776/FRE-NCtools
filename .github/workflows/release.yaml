@@ -1,9 +1,9 @@
 name: Create Release draft and upload dist
-on:
-  push:
-    tags:
-      - 20*.* # TODO update in 75 years
-      - 20*.*.*
+on: push
+#  push: commented out for testing, release step needs a tag trigger
+#    tags:
+#      - 20*.* # TODO update in 75 years
+#      - 20*.*.*
 
 jobs:
   create-release-dist:
