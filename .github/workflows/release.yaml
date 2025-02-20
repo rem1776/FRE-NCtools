@@ -23,6 +23,8 @@ jobs:
     - name: Build and create distribution
       run: |
         cd build
+        which a2x
+        make
         make distcheck
         make dist
     - name: Create release draft and upload dist files
