@@ -63,7 +63,7 @@ int get_upbound_nxcells_2dx2d_gpu(const int nlon_input_cells,  const int nlat_in
                         output_grid_ncells)
 #pragma acc data copy(upbound_nxcells)
 #pragma acc parallel loop independent reduction(+:upbound_nxcells)
-  for( int ij1=ij1_start ; ij1<ij1_end ; ij1++) {
+  for( int ij1=0 ; ij1<input_grid_ncells ; ij1++) {
     if( skip_input_cells[ij1] > MASK_THRESH ) {
 
       int i_approx_xcells_per_ij1=0;
@@ -115,10 +115,10 @@ int get_upbound_nxcells_2dx2d_gpu(const int nlon_input_cells,  const int nlat_in
         ij2_max = max(ij2_max, ij2);
 
       } //ij2
-      approx_xcells_per_ij1[ij1] = i_approx_xcells_per_ij1;
-      ij2_start[ij1] = ij2_min ;
-      ij2_end[ij1]   = ij2_max;
 
+      approx_xcells_per_ij1[ij1] = i_approx_xcells_per_ij1;
+      ij2_start[ij1] = ij2_min;
+      ij2_end[ij1]   = ij2_max;
     } //mask
   } //ij1
 
@@ -183,7 +183,7 @@ int create_xgrid_2dx2d_order1_gpu(const int nlon_input_cells,  const int nlat_in
   copyin(input_grid_ncells, output_grid_ncells)                      \
   copy(nxcells)
 #pragma acc parallel loop reduction(+:nxcells)
-  for(int ij1=ij1_start; ij1<ij1_end; ij1++) {
+  for(int ij1=0; ij1<input_grid_ncells; ij1++) {
     if(mask_input_grid[ij1] > MASK_THRESH)  {
 
       double input_cell_lon_vertices[MV], input_cell_lat_vertices[MV];

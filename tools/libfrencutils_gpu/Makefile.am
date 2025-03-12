@@ -25,6 +25,8 @@ libfrencutils_gpu_a_SOURCES = create_xgrid_gpu.c \
                               create_xgrid_gpu.h \
                               create_xgrid_utils_gpu.c \
                               create_xgrid_utils_gpu.h \
+                              interp_gpu.c \
+                              interp_gpu.h \
                               general_utils_gpu.c \
                               general_utils_gpu.h
 

@@ -55,9 +55,8 @@ void get_grid_area_gpu(const int *nlon, const int *nlat, const double *lon, cons
 
 void get_grid_great_circle_area_gpu(const int *nlon, const int *nlat, const double *lon, const double *lat, double *area)
 {
-  int nx, ny, nxp, nyp, i, j, n_in;
+  int nx, ny, nxp, nyp, i, j;
   int n0, n1, n2, n3;
-  double x_in[20], y_in[20], z_in[20];
   struct Node_gpu *grid=NULL;
   double *x=NULL, *y=NULL, *z=NULL;
 
@@ -643,12 +642,9 @@ int clip_2dx2d_great_circle_gpu(const double x1_in[], const double y1_in[], cons
   return n_out;
 }
 
-void get_grid_cell_struct_gpu( const int nlon, const int nlat, const Grid_config *output_grid,
+void get_grid_cell_struct_gpu( const int nlon, const int nlat, double *lon, double *lat,
                                Grid_cells_struct_config *grid_cells )
 {
-
-  double *lon = output_grid->lonc;
-  double *lat = output_grid->latc;
 
   int ncells=nlon*nlat;
   int npts=(nlon+1)*(nlat+1);

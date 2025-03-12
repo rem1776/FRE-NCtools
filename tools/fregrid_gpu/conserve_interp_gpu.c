@@ -60,7 +60,8 @@ void setup_conserve_interp_gpu(int ntiles_input_grid, Grid_config *input_grid, i
 
     copy_grid_to_device_gpu(ngridpts_output_grid, output_grid[otile].latc, output_grid[otile].lonc);
 
-    get_grid_cell_struct_gpu( nlon_output_cells, nlat_output_cells, output_grid+otile, &output_grid_cells );
+    get_grid_cell_struct_gpu( nlon_output_cells, nlat_output_cells, output_grid[otile].latc,
+                              output_grid[otile].lonc, &output_grid_cells );
 
     for(int itile=0; itile<ntiles_input_grid; itile++){
 

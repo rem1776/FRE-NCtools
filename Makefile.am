@@ -20,8 +20,8 @@
 ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS = lib/libnfu \
-          src \
           tools/libfrencutils \
+          tools/libfrencutils_gpu \
           tools/check_mask \
           tools/cubic_utils \
           tools/fregrid \
@@ -45,15 +45,10 @@ SUBDIRS = lib/libnfu \
           tools/simple_hydrog/lakes \
           tools/simple_hydrog/rmvpr \
           tools/nc_null_check
-
-SUBDIRS += man \
-           tests
-
-if ENABLE_GPU
-SUBDIRS += tools/libfrencutils_gpu
+SUBDIRS += tests
 SUBDIRS += tools/fregrid_gpu
 SUBDIRS += t_gpu
-endif
+
 
 # Shortcut targets to make it easier to run (very) expensive tests.
 check-expensive:

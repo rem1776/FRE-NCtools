@@ -22,14 +22,16 @@ if WITH_MPI
   bin_PROGRAMS += make_topog_parallel
 endif
 
-AM_CFLAGS = -I$(top_srcdir)/tools/libfrencutils \
-            $(NETCDF_CFLAGS)
+AM_CFLAGS = -I$(top_srcdir)/tools/libfrencutils $(OPENACC_CFLAGS) \
+             $(NETCDF_CFLAGS) -I$(top_srcdir)/tools/libfrencutils_gpu
 LDADD = $(NETCDF_LDFLAGS) $(NETCDF_LIBS) $(RPATH_FLAGS)
 
 make_topog_SOURCES = make_topog.c \
                      topog.c \
                      topog.h
-make_topog_LDADD = $(top_builddir)/tools/libfrencutils/libfrencutils.a $(LDADD)
+make_topog_LDADD = $(top_builddir)/tools/libfrencutils/libfrencutils.a \
+                   $(top_builddir)/tools/libfrencutils_gpu/libfrencutils_gpu.a \
+                   $(LDADD)
 
 make_topog_parallel_SOURCES = $(make_topog_SOURCES)
 make_topog_parallel_CFLAGS = -Duse_libMPI $(MPI_CFLAGS) $(AM_CFLAGS)

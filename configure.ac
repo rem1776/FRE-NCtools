@@ -254,8 +254,6 @@ AC_SUBST(RPATH_FLAGS) dnl
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile
                  lib/libnfu/Makefile
-                 man/Makefile
-                 src/Makefile
                  tests/Makefile
                  tools/libfrencutils/Makefile
                  tools/libfrencutils_gpu/Makefile
