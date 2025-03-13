@@ -24,7 +24,9 @@
 #include "create_xgrid.h"
 #include "mosaic_util.h"
 #include "interp.h"
+#ifdef _OPENACC
 #include "interp_gpu.h"
+#endif
 #include "mpp_io.h"
 #include "mpp.h"
 #include "mpp_domain.h"
@@ -517,8 +519,14 @@ void create_realistic_topog(int nx_dst, int ny_dst, const double *x_dst, const d
        conserve_interp_great_circle(nx_src, ny_now, nx_dst, ny_dst, x_src, y_src,
 	   	    x_out, y_out, mask_src, depth_src, depth );
      else
+     // use gpu accelerated routine for interpolations
+#ifdef _OPENACC
        conserve_interp_gpu(nx_src, ny_now, nx_dst, ny_dst, x_src, y_src,
 	   	    x_out, y_out, mask_src, depth_src, depth );
+#else
+       conserve_interp(nx_src, ny_now, nx_dst, ny_dst, x_src, y_src,
+	   	    x_out, y_out, mask_src, depth_src, depth );
+#endif
    }
 
   if (filter_topog) filter_topo(nx_dst, ny_dst, num_filter_pass, smooth_topo_allow_deepening, depth, domain);

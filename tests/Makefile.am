@@ -26,7 +26,7 @@ endif
 
 AM_CFLAGS = $(NETCDF_CFLAGS) -I$(top_builddir)/src -I$(top_srcdir)/tools/libfrencutils
 AM_FCFLAGS = -I$(top_builddir)/src
-LDADD = -L$(top_builddir)/src -lver $(NETCDF_LDFLAGS) $(NETCDF_LIBS)
+LDADD = -L$(top_builddir)/src $(NETCDF_LDFLAGS) $(NETCDF_LIBS)
 
 check_PROGRAMS = \
   create_5degree_topog \
