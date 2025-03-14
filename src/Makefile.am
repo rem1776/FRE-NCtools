@@ -212,5 +212,6 @@ split_ncvars.pl: split_ncvars/split_ncvars.pl.in Makefile
 
 install-exec-hook:
 	ln $(DESTDIR)$(bindir)/split_ncvars.pl $(DESTDIR)$(bindir)/split_ncvars
-install-data-hook:
-	ln $(DESTDIR)$(mandir)/man1/split_ncvars.pl.1 $(DESTDIR)$(mandir)/man1/split_ncvars.1
+# TODO this fails from bad path, maybe because docs are built after this directory
+#install-data-hook:
+#	ln $(DESTDIR)$(mandir)/man1/split_ncvars.pl.1 $(DESTDIR)$(mandir)/man1/split_ncvars.1
