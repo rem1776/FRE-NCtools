@@ -15,7 +15,7 @@ jobs:
         submodules: recursive
     - name: Install dependencies # no nccmp package, but this will still pass configure
       run: |
-        apt-get install -y nco which netcdf-bin libnetcdf-dev \
+        sudo apt-get install -y nco which netcdf-bin libnetcdf-dev \
           libnetcdff-dev mpich gcc gfortran asciidoc docbook-xsl docbook-xml \
           python3 python3-numpy python3-pytest perl libgomp git make libtool autoconf 
     - name: Configure
