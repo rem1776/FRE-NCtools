@@ -17,12 +17,14 @@ jobs:
         submodules: recursive
     - name: Configure
       run: |
-        dnf install -y nco
+        dnf install -y nco which
         mkdir build && cd build
         autoreconf -i ../configure.ac
         ../configure
     - name: Build and create distribution
       run: |
+        which a2x
+        which asciidocs
         cd build
         make
         make distcheck
