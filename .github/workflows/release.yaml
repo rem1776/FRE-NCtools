@@ -17,6 +17,7 @@ jobs:
         submodules: recursive
     - name: Configure
       run: |
+        dnf install -y nco
         mkdir build && cd build
         autoreconf -i ../configure.ac
         ../configure
