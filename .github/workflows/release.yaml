@@ -1,9 +1,10 @@
 name: Create Release draft and upload dist
-on: push
-#  push: commented out for testing, release step needs a tag trigger
-#    tags:
-#      - 20*.* # TODO update in 75 years
-#      - 20*.*.*
+
+on:
+  push:
+    tags:
+      - 20*.* # TODO update in 75 years
+      - 20*.*.*
 
 jobs:
   create-release-dist:
@@ -29,7 +30,7 @@ jobs:
         which asciidoc
         cd build
         make
-        make distcheck
+        make -k distcheck
         make dist
     - name: Create release draft and upload dist files
       uses: softprops/action-gh-release@v2
