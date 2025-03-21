@@ -1,4 +1,4 @@
-name: Create Release draft and upload dist
+name: Create release draft with generated distribution file
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Install dependencies # no nccmp package, but this will still pass configure
+    - name: Install dependencies
       run: |
         sudo apt-get install -y nco which netcdf-bin libnetcdf-dev \
           libnetcdff-dev mpich gcc gfortran asciidoc docbook-xsl docbook-xml \
@@ -22,17 +22,15 @@ jobs:
     - name: Configure
       run: |
         mkdir build && cd build
-        autoreconf -i ../configure.ac
+        autoreconf -if ../configure.ac
         ../configure
-    - name: Build and create distribution
+    - name: Build and create distribution file
       run: |
-        which a2x
-        which asciidoc
         cd build
         make
-        make -k distcheck
+        make distcheck
         make dist
-    - name: Create release draft and upload dist files
+    - name: Create release draft and upload file
       uses: softprops/action-gh-release@v2
       with:
         files: |
