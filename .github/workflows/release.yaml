@@ -23,7 +23,7 @@ jobs:
       run: |
         mkdir build && cd build
         autoreconf -if ../configure.ac
-        ../configure --enable-mpi
+        ../configure
     - name: Build and create distribution file
       run: |
         cd build
