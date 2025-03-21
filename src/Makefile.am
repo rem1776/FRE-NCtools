@@ -210,9 +210,9 @@ split_ncvars.pl: split_ncvars/split_ncvars.pl.in Makefile
 	$(do_subst) < $(srcdir)/split_ncvars/split_ncvars.pl.in > split_ncvars.pl
 	chmod +x split_ncvars.pl
 
-# TODO not sure how to remove this file with distclean
+# TODO causes issues with distclean
 #install-exec-hook:
 #	ln $(DESTDIR)$(bindir)/split_ncvars.pl $(DESTDIR)$(bindir)/split_ncvars
-# TODO this fails from bad path, maybe because docs are built after this directory
+# TODO file not found, might run before docs are built
 #install-data-hook:
 #	ln $(DESTDIR)$(mandir)/man1/split_ncvars.pl.1 $(DESTDIR)$(mandir)/man1/split_ncvars.1
