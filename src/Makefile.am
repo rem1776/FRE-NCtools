@@ -70,7 +70,7 @@ version.h: Makefile
 	$(AC_V_at)chmod a-w $@t
 	$(AM_V_at)mv $@t $@
 
-DISTCLEANFILES = $(BUILT_SOURCES)
+DISTCLEANFILES = $(BUILT_SOURCES) split_ncvars
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
 EXTRA_DIST = \
