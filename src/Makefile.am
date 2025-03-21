@@ -70,7 +70,7 @@ version.h: Makefile
 	$(AC_V_at)chmod a-w $@t
 	$(AM_V_at)mv $@t $@
 
-DISTCLEANFILES = $(BUILT_SOURCES) split_ncvars
+DISTCLEANFILES = $(BUILT_SOURCES)
 MAINTAINERCLEANFILES = $(BUILT_SOURCES)
 
 EXTRA_DIST = \
@@ -210,8 +210,9 @@ split_ncvars.pl: split_ncvars/split_ncvars.pl.in Makefile
 	$(do_subst) < $(srcdir)/split_ncvars/split_ncvars.pl.in > split_ncvars.pl
 	chmod +x split_ncvars.pl
 
-install-exec-hook:
-	ln $(DESTDIR)$(bindir)/split_ncvars.pl $(DESTDIR)$(bindir)/split_ncvars
+# TODO not sure how to remove this file with distclean
+#install-exec-hook:
+#	ln $(DESTDIR)$(bindir)/split_ncvars.pl $(DESTDIR)$(bindir)/split_ncvars
 # TODO this fails from bad path, maybe because docs are built after this directory
 #install-data-hook:
 #	ln $(DESTDIR)$(mandir)/man1/split_ncvars.pl.1 $(DESTDIR)$(mandir)/man1/split_ncvars.1
