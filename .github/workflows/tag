@@ -1,0 +1,24 @@
+name: Tag for release
+on:
+  push:
+    paths:
+      - configure.ac 
+jobs:
+  tag_release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Get tag name
+      run: |
+        echo "tagName=`grep -E '?[0-9]{4}\.[0-9]{2}(\.[0-9]{2})?' configure.ac`" >> "$GTIHUB_ENV"
+    - name: Create tag
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/${tagName}',
+              sha: context.sha
+            })
