@@ -18,9 +18,10 @@ jobs:
         TAG: ${{ steps.get-tag.outputs.TAGNAME }}
       with:
         script: |
+          const title = process.env.TAG;
           github.rest.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: 'refs/tags/${TAG}',
+            ref: `refs/tags/${title}`,
             sha: context.sha
           })
