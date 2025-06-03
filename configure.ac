@@ -27,6 +27,7 @@ AC_INIT(
   [fre-nctools],
   [https://github.com/NOAA-GFDL/FRE-NCtools])
 
+
 # Place the git description information in the configure script
 m4_define([git_revision],
   [m4_esyscmd_s([git describe --tags --always --dirty 2> /dev/null || echo "unknown version"])])
